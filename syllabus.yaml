@@ -1,0 +1,240 @@
+
+course: "Intelligent Prompting (SIUE)"
+tiers:
+  - tier: "Tier 1 — Foundations of Generative AI"
+    weeks:
+      - id: wk01-foundations
+        week: "Week 1 — Foundations of Generative AI"
+        module: "Foundations of generative AI; LLMs; capabilities & limits; use cases; intro to ChatGPT"
+        title: "What Generative AI Can (and Can’t) Do"
+        learning_outcomes:
+          - "Explain what generative AI and LLMs are"
+          - "Identify appropriate vs. inappropriate AI use cases"
+          - "Describe key limitations (hallucination, bias, context limits)"
+        activity_types:
+          - "Mini-lecture"
+          - "Think–pair–share"
+          - "Live AI exploration"
+        in_class_demo:
+          - "Explain what generative AI is to a high school student in 100 words."
+          - "List 5 tasks ChatGPT should not be used for in academic settings."
+        grounding: "Course syllabus AI policy excerpt"
+        assessment: "Exit ticket: identify 1 good and 1 bad AI use case (pass/fail)"
+        time_box: "15–20 minutes"
+
+      - id: wk02-prompting-communication
+        week: "Week 2 — Prompting as Communication"
+        module: "How AI interprets inputs; intent; anatomy of a prompt"
+        title: "How AI Reads What You Write"
+        learning_outcomes:
+          - "Distinguish explicit vs. implicit instructions"
+          - "Identify components of an effective prompt"
+          - "Explain how structure affects output"
+        activity_types:
+          - "Prompt comparison"
+          - "Group discussion"
+        in_class_demo:
+          - "Summarize climate change."
+          - "Summarize climate change for first-year college students in 3 bullet points using neutral tone."
+        grounding: "Prompt anatomy slide (instruction, role, input, output)"
+        assessment: "Submit revised prompt with labeled components"
+        time_box: "20 minutes"
+
+  - tier: "Tier 2 — Core Prompting Patterns"
+    weeks:
+      - id: wk03-instructional-role
+        week: "Week 3 — Instructional & Role-Based Prompts"
+        module: "Instructional, role-based, persona, template patterns"
+        title: "Telling the AI Who It Is"
+        learning_outcomes:
+          - "Apply role-based prompting"
+          - "Use templates to standardize outputs"
+          - "Adapt prompts to different audiences"
+        activity_types:
+          - "Prompt rewriting"
+          - "Peer feedback"
+        in_class_demo:
+          - "You are a statistics tutor. Explain standard deviation to a nervous student."
+          - "Rewrite this explanation for a business executive."
+        grounding: "Audience personas handout"
+        assessment: "Submit 2 role-based prompts + reflection (150 words)"
+        time_box: "20 minutes"
+
+      - id: wk04-iterative-refinement
+        week: "Week 4 — Iterative & Refinement Patterns"
+        module: "Refinement; outline expansion; alternative approaches"
+        title: "Improving Outputs Through Iteration"
+        learning_outcomes:
+          - "Use iterative prompting to refine results"
+          - "Expand outlines into full responses"
+          - "Compare alternative outputs"
+        activity_types:
+          - "Live iteration"
+          - "Small-group analysis"
+        in_class_demo:
+          - "Create an outline for a 5-minute presentation on data privacy."
+          - "Expand section 2 with examples and plain language."
+        grounding: "Sample rubric excerpt"
+        assessment: "Submit before/after output comparison (graded rubric ≥8/10)"
+        time_box: "20 minutes"
+
+      - id: wk05-reasoning-verification
+        week: "Week 5 — Reasoning & Verification Patterns"
+        module: "Cognitive verifier; fact-check lists; chain-of-thought (conceptual)"
+        title: "Getting Better Answers Without Blind Trust"
+        learning_outcomes:
+          - "Apply verification prompts"
+          - "Identify overconfident or unsupported claims"
+          - "Use reasoning prompts responsibly"
+        activity_types:
+          - "Error spotting"
+          - "Verification checklist"
+        in_class_demo:
+          - "Answer the question and then list assumptions you made."
+          - "Provide a fact-check checklist for this response."
+        grounding: "Academic integrity policy"
+        assessment: "Annotated AI response identifying risks"
+        time_box: "20 minutes"
+
+      - id: wk06-creative-interactive
+        week: "Week 6 — Creative & Interactive Patterns"
+        module: "Few-shot, game play, recipe, menu actions, creativity"
+        title: "Designing Interactive Prompts"
+        learning_outcomes:
+          - "Use few-shot examples effectively"
+          - "Design interactive AI workflows"
+          - "Generate creative outputs with constraints"
+        activity_types:
+          - "Prompt design lab"
+        in_class_demo:
+          - "Here are two examples. Generate a third following the same pattern."
+          - "Create a menu of actions for revising an essay."
+        grounding: "Example few-shot prompt"
+        assessment: "Submit reusable prompt template"
+        time_box: "20 minutes"
+
+  - tier: "Tier 3 — Advanced Prompt Design"
+    weeks:
+      - id: wk07-long-complex
+        week: "Week 7 — Long & Complex Inputs"
+        module: "Chunking; summarization vs. synthesis"
+        title: "Prompting with Long Content"
+        learning_outcomes:
+          - "Apply chunking strategies"
+          - "Distinguish summary from synthesis"
+          - "Manage ambiguity in long inputs"
+        activity_types:
+          - "Document chunking exercise"
+        in_class_demo:
+          - "Summarize each section separately."
+          - "Synthesize the main argument across all sections."
+        grounding: "Sample article excerpt"
+        assessment: "Submit synthesized summary (150 words)"
+        time_box: "20 minutes"
+
+      - id: wk08-multi-step
+        week: "Week 8 — Multi-Step Prompt Workflows"
+        module: "Prompt orchestration; reusable workflows"
+        title: "Designing Prompt Pipelines"
+        learning_outcomes:
+          - "Create multi-step prompts"
+          - "Design error recovery prompts"
+          - "Build reusable workflows"
+        activity_types:
+          - "Workflow mapping"
+        in_class_demo:
+          - "Step 1: Analyze. Step 2: Critique. Step 3: Improve."
+          - "If information is missing, ask clarifying questions."
+        grounding: "Workflow diagram"
+        assessment: "Submit 3-step prompt workflow"
+        time_box: "20 minutes"
+
+      - id: wk09-multimodal
+        week: "Week 9 — Multimodal Prompting"
+        module: "Images; PDFs; limitations"
+        title: "Prompting Beyond Text"
+        learning_outcomes:
+          - "Prompt with visual and document inputs"
+          - "Identify multimodal limitations"
+          - "Apply verification strategies"
+        activity_types:
+          - "Image interpretation"
+          - "Discussion"
+        in_class_demo:
+          - "Describe trends shown in this chart."
+          - "What can’t you conclude from this image?"
+        grounding: "Uploaded image or PDF excerpt"
+        assessment: "Reflection on model limitations"
+        time_box: "15–20 minutes"
+
+  - tier: "Tier 4 — Data Analysis with Generative AI"
+    weeks:
+      - id: wk10-qualitative
+        week: "Week 10 — Qualitative Analysis"
+        module: "Coding; themes; bias"
+        title: "AI for Qualitative Data"
+        learning_outcomes:
+          - "Use AI for text coding"
+          - "Identify bias in qualitative outputs"
+          - "Apply validation strategies"
+        activity_types:
+          - "Coding comparison"
+        in_class_demo:
+          - "Identify themes in these interview excerpts."
+          - "Explain potential bias in your coding."
+        grounding: "Interview transcript excerpt"
+        assessment: "Submit coded themes + validation note"
+        time_box: "20 minutes"
+
+      - id: wk11-quantitative
+        week: "Week 11 — Quantitative & Exploratory Analysis"
+        module: "Trends; tables; charts"
+        title: "Using AI for Quantitative Insight"
+        learning_outcomes:
+          - "Frame datasets effectively"
+          - "Interpret AI-generated tables"
+          - "Identify misuse risks"
+        activity_types:
+          - "Data framing"
+        in_class_demo:
+          - "Describe trends in this dataset."
+          - "What uncertainty should be noted?"
+        grounding: "Sample dataset"
+        assessment: "Short analysis with limitations paragraph"
+        time_box: "20 minutes"
+
+  - tier: "Tier 5 — Trustworthy & Ethical AI Use"
+    weeks:
+      - id: wk12-trustworthy
+        week: "Week 12 — Trustworthy AI"
+        module: "Hallucinations; reliability; HITL"
+        title: "Designing for Reliability"
+        learning_outcomes:
+          - "Detect hallucinations"
+          - "Apply output evaluation techniques"
+          - "Design human-in-the-loop prompts"
+        activity_types:
+          - "Reliability checklist"
+        in_class_demo:
+          - "Rate confidence in each claim."
+          - "Suggest where human review is required."
+        grounding: "Reliability rubric"
+        assessment: "Score ≥8/10 on reliability rubric"
+        time_box: "20 minutes"
+
+      - id: wk13-ethics
+        week: "Week 13 — Ethical & Responsible Use"
+        module: "Bias; integrity; disclosure"
+        title: "Ethical AI in Academic & Professional Contexts"
+        learning_outcomes:
+          - "Apply ethical AI principles"
+          - "Draft transparency statements"
+          - "Identify responsible use boundaries"
+        activity_types:
+          - "Case discussion"
+        in_class_demo:
+          - "Is this AI use ethical? Why or why not?"
+          - "Draft an AI disclosure statement."
+        grounding: "Institutional academic integrity policy"
+        assessment: "Submit disclosure + reflection (150 words)"
+        time_box: "15–20 minutes"
