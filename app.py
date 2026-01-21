@@ -18,9 +18,8 @@ This module introduces the core ideas behind generative AI and large language mo
 Use the menu on the left to explore each subject in this module.
 """)
 
-# ---- Sidebar navigation ----
+# ---- Sidebar Navigation ----
 st.sidebar.title("Module 1 Subjects")
-
 page = st.sidebar.radio(
     "Choose a subject:",
     [
@@ -34,211 +33,111 @@ page = st.sidebar.radio(
     ]
 )
 
-# ---- Subject Pages ----
-
 # ---- LECTURE SECTION ----
 if page == "🎧 Lecture Video / Voice Recording":
     st.subheader("🎧 Lecture for Module 1 — Foundations of Generative AI")
 
-    st.markdown("""
-Below is your Module 1 lecture. You may choose to watch the full video lecture,
-listen to the audio-only version, or both.
-    """)
+    # -------- PDF Notes --------
+    try:
+        with open("notes/module1_notes.pdf", "rb") as pdf_file:
+            st.download_button(
+                label="📄 Download Module 1 PDF Notes",
+                data=pdf_file,
+                file_name="Module1_Notes.pdf",
+                mime="application/pdf"
+            )
+    except:
+        st.warning("PDF notes not found. Upload `notes/module1_notes.pdf` to enable downloads.")
 
     st.markdown("### 📺 Video Lecture")
-    st.video("https://www.youtube.com/watch?v=NJ8RmgY-jP0")   # Replace with your link or MP4 file
-
-    st.markdown("---")
+    st.video("https://www.youtube.com/watch?v=XXXXXXXXXXX")  # Replace with your link
 
     st.markdown("### 🎤 Audio Version")
-    st.audio("lecture_audio/module1_voice_over.mp3")           # Replace with your audio file path
+    try:
+        st.audio("lecture_audio/module1_voice_over.mp3")
+    except:
+        st.warning("Audio file not found. Add it to `lecture_audio/`.")
 
-
-
-# 1 — What generative AI is and how it works
-if page == "What generative AI is and how it works":
-    st.subheader("📌 What generative AI is and how it works")
-
+    # -------- Transcript --------
+    st.markdown("---")
+    st.markdown("### 📝 Lecture Transcript")
     st.markdown("""
-### **Lecture Reading**
-Generative AI refers to a type of artificial intelligence that *creates new content* based on patterns it has learned from large amounts of data.  
-This content can include text, images, summaries, explanations, stories, analyses, or even code.
-
-Large models like ChatGPT do not “think” or “understand.”  
-Instead, they predict the next most likely word, sentence, or structure based on their training data.
-
-Generative AI works through:
-1. **Training on massive datasets**  
-   The AI learns patterns from textbooks, articles, public websites, conversations, and more.
-2. **Pattern prediction**  
-   When you type a prompt, the model predicts the most likely response.
-3. **Continuous refinement**  
-   Models improve over time based on updates and new training methods.
-
-Although generative AI appears intelligent, its behavior is pattern-based—not conscious or self-aware.
+**Module 1 — Foundations of Generative AI (Transcript Placeholder)**  
+You can paste your transcript here or generate one automatically 
+after recording your lecture.
 """)
 
-# 2 — What LLMs can and cannot do
+    # -------- Quiz Questions --------
+    st.markdown("---")
+    st.markdown("### 🧠 Quick Knowledge Check")
+
+    q1 = st.radio(
+        "1. What does a large language model primarily do?",
+        [
+            "Understands meaning like a human",
+            "Predicts the next most likely word based on patterns",
+            "Searches the internet in real time"
+        ]
+    )
+    if q1:
+        if q1 == "Predicts the next most likely word based on patterns":
+            st.success("Correct!")
+        else:
+            st.error("Not quite. Try again.")
+
+    # -------- Navigation Button --------
+    st.markdown("---")
+    if st.button("➡️ Go to Module 2"):
+        st.info("Module 2 will be available soon.")
+
+# ---- SUBJECT PAGES ----
+elif page == "What generative AI is and how it works":
+    st.subheader("📌 What generative AI is and how it works")
+    st.markdown("""
+### Lecture Reading
+Generative AI refers to a type of artificial intelligence that creates new content
+based on patterns learned from large datasets.
+""")
+
+
 elif page == "What LLMs can and cannot do":
     st.subheader("📌 What large language models (LLMs) can and cannot do")
-
     st.markdown("""
-### **Lecture Reading**
-LLMs excel at:
-- Producing clear explanations  
-- Summarizing long text  
-- Brainstorming ideas  
-- Rewriting or editing text  
-- Generating creative content  
-- Breaking down complex concepts  
-- Assisting with analysis and planning  
-
-However, LLMs **cannot**:
-- Guarantee factual accuracy  
-- Understand information the way humans do  
-- Access real-time private databases  
-- Verify the truth of every statement  
-- Replace expert judgment  
-- Make moral or ethical decisions  
-
-A key skill in this course is learning how to **work with these strengths and limitations**.
+### Lecture Reading
+LLMs can generate text, summarize information, provide explanations,
+and assist with reasoning — but they cannot guarantee accuracy.
 """)
 
-# 3 — Everyday uses across fields
+
 elif page == "Everyday uses of AI across different fields":
     st.subheader("📌 Everyday uses of AI across different fields")
-
     st.markdown("""
-### **Lecture Reading**
-Generative AI is used across nearly every discipline:
-
-#### **Business**
-- Writing emails or reports  
-- Market analysis summaries  
-- Customer message drafting  
-
-#### **Engineering**
-- High-level explanations of concepts  
-- Brainstorming design alternatives  
-- Document summarization  
-
-#### **Healthcare & Nursing**
-- Simplifying medical explanations  
-- Patient education materials  
-- Research article summaries  
-
-#### **Psychology & Social Sciences**
-- Theme extraction from interviews  
-- Scenario generation  
-- Survey response analysis  
-
-#### **Arts and Media**
-- Creative brainstorming  
-- Story generation  
-- Style descriptions  
-
-#### **Education**
-- Lesson planning  
-- Creating examples at different levels  
-- Adapting material for diverse learners  
-
-LLMs can support—but not replace—expert knowledge in every field.
+### Lecture Reading
+Generative AI is used in business, engineering, healthcare,
+education, design, and social sciences.
 """)
 
-# 4 — Introduction to tools
+
 elif page == "Introduction to tools like ChatGPT, Copilot, Claude, Gemini":
-    st.subheader("📌 Introduction to tools like ChatGPT, Copilot, Claude, Gemini")
-
+    st.subheader("📌 Introduction to AI Tools")
     st.markdown("""
-### **Lecture Reading**
-There are many types of generative AI tools. The most common include:
-
-#### **ChatGPT (OpenAI)**
-Known for:
-- Conversational ability  
-- Explanation clarity  
-- Creativity  
-- Writing assistance  
-
-#### **Claude (Anthropic)**
-Known for:
-- Long document handling  
-- Safety considerations  
-- Clear reasoning  
-
-#### **Gemini (Google)**
-Known for:
-- Web-connected responses  
-- Multimodal capabilities  
-- Integration with Google workspace tools  
-
-#### **Microsoft Copilot**
-Known for:
-- Integration with Microsoft 365  
-- Practical productivity support  
-- Document, email, and presentation generation  
-
-Each tool is slightly different, but the prompting principles in this course work across all of them.
+### Lecture Reading
+These tools differ in strengths, but prompting skills apply to all of them.
 """)
 
-# 5 — Prompting as communication
+
 elif page == "Prompting as a communication and thinking skill":
-    st.subheader("📌 Prompting as a communication and thinking skill")
-
+    st.subheader("📌 Prompting as communication and thinking skill")
     st.markdown("""
-### **Lecture Reading**
-Prompting is not just typing something into a box.  
-It is a form of **communication** and **structured thinking**.
-
-Good prompting requires:
-- Clear instructions  
-- Defined goals  
-- Context  
-- Constraints  
-- Desired format  
-
-In many ways, prompting helps you:
-- Think more clearly  
-- Break down complex problems  
-- Organize your own ideas  
-- Practice concise communication  
-
-You will learn prompting patterns that allow you to give AI more precise and useful instructions.
+### Lecture Reading
+Prompting requires clarity, structure, and context.
 """)
 
-# 6 — Clear vs unclear instructions
+
 elif page == "Clear vs. unclear instructions (real-world examples)":
-    st.subheader("📌 Clear vs. unclear instructions")
-
+    st.subheader("📌 Clear vs unclear instructions")
     st.markdown("""
-### **Lecture Reading**
-LLMs respond differently depending on how clearly you communicate.
-
-#### **Unclear prompt example:**  
-“Explain this better.”
-
-#### **Clear prompt example:**  
-“Rewrite the following paragraph at a 10th-grade reading level and highlight the three main ideas.”
-
-#### **Unclear:**  
-“Tell me about photosynthesis.”
-
-#### **Clear:**  
-“Explain photosynthesis in 4 steps, using plain language, and give one example relevant to agriculture.”
-
-#### **Examples Across Majors**
-
-- **Nursing:**  
-  *Unclear:* “Explain diabetes.”  
-  *Clear:* “Explain Type 2 diabetes to a patient with no medical background using friendly, simple language.”
-
-- **Business:**  
-  *Unclear:* “Help with marketing.”  
-  *Clear:* “Generate three marketing messages targeting 25–40-year-old customers interested in fitness technology.”
-
-- **Engineering:**  
-  *Unclear:* “Explain stress.”  
-  *Clear:* “Explain mechanical stress with one everyday analogy and keep the explanation under 120 words.”
-
-The clearer your instructions, the better the output.
+### Lecture Reading
+Clear prompts produce clear outputs.  
+Examples across disciplines.
 """)
