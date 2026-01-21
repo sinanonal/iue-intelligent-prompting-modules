@@ -55,15 +55,9 @@ if page == "🎧 Lecture Video / Voice Recording":
 
     # VIDEO
     st.markdown("### 📺 Video Lecture")
-    st.video("https://www.youtube.com/watch?v=XXXXXXXXXXX")
+    st.video("https://www.youtube.com/watch?v=NJ8RmgY-jP0")
 
-    # AUDIO
-    st.markdown("### 🎤 Audio Version")
-    try:
-        st.audio("lecture_audio/module1_voice_over.mp3")
-    except:
-        st.warning("Audio file not found. Add your file to `lecture_audio/module1_voice_over.mp3`.")
-
+    
     # TRANSCRIPT
     st.markdown("---")
     st.markdown("### 📝 Lecture Transcript")
