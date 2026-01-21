@@ -20,9 +20,11 @@ Use the menu on the left to explore each subject in this module.
 
 # ---- Sidebar navigation ----
 st.sidebar.title("Module 1 Subjects")
+
 page = st.sidebar.radio(
     "Choose a subject:",
     [
+        "🎧 Lecture Video / Voice Recording",
         "What generative AI is and how it works",
         "What LLMs can and cannot do",
         "Everyday uses of AI across different fields",
@@ -33,6 +35,25 @@ page = st.sidebar.radio(
 )
 
 # ---- Subject Pages ----
+
+# ---- LECTURE SECTION ----
+if page == "🎧 Lecture Video / Voice Recording":
+    st.subheader("🎧 Lecture for Module 1 — Foundations of Generative AI")
+
+    st.markdown("""
+Below is your Module 1 lecture. You may choose to watch the full video lecture,
+listen to the audio-only version, or both.
+    """)
+
+    st.markdown("### 📺 Video Lecture")
+    st.video("https://www.youtube.com/watch?v=NJ8RmgY-jP0")   # Replace with your link or MP4 file
+
+    st.markdown("---")
+
+    st.markdown("### 🎤 Audio Version")
+    st.audio("lecture_audio/module1_voice_over.mp3")           # Replace with your audio file path
+
+
 
 # 1 — What generative AI is and how it works
 if page == "What generative AI is and how it works":
