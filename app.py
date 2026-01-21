@@ -50,14 +50,9 @@ if page == "🎧 Lecture Video / Voice Recording":
         st.warning("PDF notes not found. Upload `notes/module1_notes.pdf` to enable downloads.")
 
     st.markdown("### 📺 Video Lecture")
-    st.video("https://www.youtube.com/watch?v=XXXXXXXXXXX")  # Replace with your link
+    st.video("https://www.youtube.com/watch?v=JTxsNm9IdYU&list=PLsprmdocuVe8Tn23MlNkMkoS-cZAJb6gC&index=2")  # Replace with your link
 
-    st.markdown("### 🎤 Audio Version")
-    try:
-        st.audio("lecture_audio/module1_voice_over.mp3")
-    except:
-        st.warning("Audio file not found. Add it to `lecture_audio/`.")
-
+    
     # -------- Transcript --------
     st.markdown("---")
     st.markdown("### 📝 Lecture Transcript")
