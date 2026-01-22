@@ -215,86 +215,78 @@ elif page == "What generative AI is and how it works":
 
     st.markdown("""
 ### Reading
-GGenerative artificial intelligence refers to algorithms that can create new content.
-Traditional AI systems typically classify, sort, or make decisions based on
-predefined rules or learned patterns. For example, a classical machine learning
-model might determine whether an email is spam or predict the likelihood
+Generative artificial intelligence refers to algorithms that can create new content.
+Traditional AI systems typically classify, sort, or make decisions based on predefined rules or learned patterns.
+For example, a classical machine learning model might determine whether an email is spam or predict the likelihood
 that a customer will make a purchase. Generative AI goes beyond classification.
-It produces original text, visuals, or other forms of output by learning the
-structure and patterns of human-generated content.
+It produces original text, visuals, or other forms of output by learning the structure and patterns of human-generated content.
 
-Modern generative AI systems, especially large language models (LLMs),
-have been trained on vast collections of text taken from books, articles, websites,
-academic papers, and human conversations. Through this exposure, the model
-learns not only the rules of grammar but also the structures of arguments,
-the flow of explanations, the tone appropriate to different audiences, and the
+Modern generative AI systems, especially large language models (LLMs), have been trained on vast collections of text taken from
+books, articles, websites, academic papers, and human conversations. Through this exposure, the model learns not only the rules of
+grammar but also the structures of arguments, the flow of explanations, the tone appropriate to different audiences, and the
 connections between ideas across disciplines.
 
-At first glance, this ability to generate human-like content may give the
-impression of intelligence, creativity, and deep understanding. However, generative
-AI models do not think. They do not possess beliefs, values, consciousness,
-or emotional awareness. Instead, they operate on the statistical relationships
-between the words and concepts they encountered during training. Understanding
-this distinction is critical for interpreting their output accurately and using
-them appropriately in academic work..
+At first glance, this ability to generate human-like content may give the impression of intelligence, creativity, and deep understanding.
+However, generative AI models do not think. They do not possess beliefs, values, consciousness, or emotional awareness.
+Instead, they operate on the statistical relationships between the words and concepts they encountered during training.
+Understanding this distinction is critical for interpreting their output accurately and using them appropriately in academic work.
 """)
 
-    elif page == "What generative AI is and how it works":
     st.markdown("### 🧪 Quick Activity: Check Your Understanding")
 
-# Question 1
-q1 = st.radio(
-    "1) What is the main difference between traditional AI and generative AI?",
-    [
-        "Traditional AI relies only on human-written rules",
-        "Traditional AI classifies or predicts, while generative AI creates new content",
-        "Generative AI is always more accurate than traditional AI",
-        "Traditional AI can generate original text"
-    ],
-    index=None,
-    key="mc_q1"
-)
+    # Question 1
+    q1 = st.radio(
+        "1) What is the main difference between traditional AI and generative AI?",
+        [
+            "Traditional AI relies only on human-written rules",
+            "Traditional AI classifies or predicts, while generative AI creates new content",
+            "Generative AI is always more accurate than traditional AI",
+            "Traditional AI can generate original text"
+        ],
+        index=None,
+        key="m1_mc_q1"  # unique key
+    )
 
-# Question 2
-q2 = st.radio(
-    "2) Why can generative AI appear intelligent or creative?",
-    [
-        "It has beliefs and emotions",
-        "It reasons like a human",
-        "It produces human-like language based on training data",
-        "It verifies facts using external databases"
-    ],
-    index=None,
-    key="mc_q2"
-)
+    # Question 2
+    q2 = st.radio(
+        "2) Why can generative AI appear intelligent or creative?",
+        [
+            "It has beliefs and emotions",
+            "It reasons like a human",
+            "It produces human-like language based on training data",
+            "It verifies facts using external databases"
+        ],
+        index=None,
+        key="m1_mc_q2"  # unique key
+    )
 
-# Question 3
-q3 = st.radio(
-    "3) Which statement best describes how large language models generate responses?",
-    [
-        "They think and understand meaning",
-        "They make ethical judgments",
-        "They rely on statistical patterns learned during training",
-        "They access private or real-time databases"
-    ],
-    index=None,
-    key="mc_q3"
-)
+    # Question 3
+    q3 = st.radio(
+        "3) Which statement best describes how large language models generate responses?",
+        [
+            "They think and understand meaning",
+            "They make ethical judgments",
+            "They rely on statistical patterns learned during training",
+            "They access private or real-time databases"
+        ],
+        index=None,
+        key="m1_mc_q3"  # unique key
+    )
 
-if st.button("Check Answers"):
-    correct = 0
+    if st.button("Check Answers", key="m1_mc_check"):
+        correct = 0
 
-    if q1 == "Traditional AI classifies or predicts, while generative AI creates new content":
-        correct += 1
-    if q2 == "It produces human-like language based on training data":
-        correct += 1
-    if q3 == "They rely on statistical patterns learned during training":
-        correct += 1
+        if q1 == "Traditional AI classifies or predicts, while generative AI creates new content":
+            correct += 1
+        if q2 == "It produces human-like language based on training data":
+            correct += 1
+        if q3 == "They rely on statistical patterns learned during training":
+            correct += 1
 
-    if correct == 3:
-        st.success("✅ Excellent! You answered all questions correctly.")
-    else:
-        st.warning(f"You answered {correct}/3 correctly. Review the reading and try again.")
+        if correct == 3:
+            st.success("✅ Excellent! You answered all questions correctly.")
+        else:
+            st.warning(f"You answered {correct}/3 correctly. Review the reading and try again.")
 
 
 # =======================================================
