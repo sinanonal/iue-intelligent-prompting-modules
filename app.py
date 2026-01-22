@@ -59,7 +59,3 @@ col1, col2 = st.columns(2)
 with col1:
     if st.button("📘 Go to Course Overview"):
         st.switch_page("pages/00_Course Overview.py")
-
-with col2:
-    if st.button("➡️ Go to Module 1"):
-        st.switch_page("pages/01_Module 1.py")
