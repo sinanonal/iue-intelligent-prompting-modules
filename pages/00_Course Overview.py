@@ -2,6 +2,8 @@ import streamlit as st
 from auth import require_access
 
 require_access()
+st.sidebar.empty()
+
 
 st.write("Module 1 content here")
 
