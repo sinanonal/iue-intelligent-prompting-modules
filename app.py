@@ -1,4 +1,3 @@
-
 import streamlit as st
 from auth import init_course_page
 
@@ -8,12 +7,10 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# This draws: top bar + sidebar nav + auth gate
 init_course_page("Home Page", "app.py")
 
-
-
 # ===== PAGE CONTENT =====
-
 st.title("📘 Intelligent Prompting: Using AI for Creative and Analytical Thinking")
 st.header("Welcome")
 
@@ -49,15 +46,13 @@ st.markdown("---")
 st.subheader("🚀 Getting Started")
 
 st.markdown("""
-To begin, review the **Course Overview and Introduction** to understand how the course is organized.  
-When you are ready, continue to **Module 1** to start learning about generative AI and prompting.
+To begin, use the **sidebar** to open **Course Overview** and review the introduction.  
+When you are ready, continue to **Module 1** from the sidebar.
 """)
 
-# Navigation button (size will match other page_link buttons)
+# Optional: keep a button, but route using st.switch_page safely
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    st.page_link(
-        "pages/00_Course Overview.py",
-        label="➡️ Course Overview"
-    )
+    if st.button("➡️ Course Overview", use_container_width=True):
+        st.switch_page("pages/00_Course Overview.py")  # MUST match your real filename exactly
