@@ -1,257 +1,363 @@
-import streamlit as st
-import pandas as pd
-from datetime import date
-from pathlib import Path
+# auth.py
+# Lightweight identity + submission utilities for a Streamlit course app.
+# Purpose: make students enter identity ONCE, persist it across pages,
+# and use it to name/download/submit assignments reliably.
+
+from __future__ import annotations
+
+import os
 import re
+import json
+import time
+import hashlib
+from pathlib import Path
+from typing import Optional, Dict, Any, Tuple
 
-# ===== SETTINGS =====
-SEMESTER_END = date(2026, 5, 15)
-ROSTER_PATH = "roster.csv"
-ALLOWED_DOMAIN = "@siue.edu"
-PAGES_DIR = Path("pages")
+import streamlit as st
 
-# ===== HELPERS =====
-def _norm_email(x: str) -> str:
-    return (x or "").strip().lower()
 
-@st.cache_data
-def _load_roster(path: str) -> set[str]:
-    df = pd.read_csv(path)
-    if "email" not in df.columns:
-        raise ValueError("Roster CSV must include a column named 'email'.")
-    return {_norm_email(e) for e in df["email"].dropna()}
+# -----------------------------
+# Configuration
+# -----------------------------
+DEFAULT_DATA_DIR = "data"  # stored in the app working directory
+IDENTITY_STATE_KEY = "student_identity"
+APP_SALT_ENV = "COURSE_APP_SALT"          # optional: set in Streamlit secrets/env
+INSTRUCTOR_PIN_ENV = "INSTRUCTOR_PIN"    # optional: instructor-only area
+REQUIRE_EMAIL_DEFAULT = False            # you can override per page call
 
-def logout():
-    for k in [
-        "authorized",
-        "user_email",
-        "current_page_path",
-        "course_contents_choice",
-        "course_overview_section",
-        "student_full_name",
-    ]:
-        st.session_state.pop(k, None)
-    st.rerun()
 
-def require_access():
-    if date.today() > SEMESTER_END:
-        st.error("This course app is no longer available (semester access has ended).")
-        st.stop()
+# -----------------------------
+# Helpers
+# -----------------------------
+def _now_iso() -> str:
+    return time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime())
 
-    st.session_state.setdefault("authorized", False)
-    st.session_state.setdefault("user_email", "")
 
-    if st.session_state["authorized"]:
-        return
+def _safe_slug(text: str, max_len: int = 64) -> str:
+    text = text.strip().lower()
+    text = re.sub(r"[^a-z0-9]+", "-", text)
+    text = re.sub(r"-{2,}", "-", text).strip("-")
+    return text[:max_len] if text else "student"
 
-    roster = _load_roster(ROSTER_PATH)
 
-    st.title("Course App Login")
-    email = st.text_input("Enter your SIUE email", placeholder="name@siue.edu")
+def _get_salt() -> str:
+    # Salt improves stability of generated ids across runs while avoiding obvious IDs.
+    # Use env var if set; otherwise a constant fallback is okay for a class tool.
+    return os.getenv(APP_SALT_ENV, "streamlit-course-salt")
 
-    col1, col2 = st.columns([1, 2])
-    with col1:
-        login_clicked = st.button("Log in", use_container_width=True)
-    with col2:
-        st.caption("Access is limited to enrolled students during the semester.")
 
-    if login_clicked:
-        email_n = _norm_email(email)
+def _hash_id(name: str, email: str = "") -> str:
+    raw = (name.strip().lower() + "|" + email.strip().lower() + "|" + _get_salt()).encode("utf-8")
+    return hashlib.sha256(raw).hexdigest()[:12]
 
-        if not email_n.endswith(ALLOWED_DOMAIN):
-            st.error("Please use your SIUE email address.")
-            st.stop()
 
-        if email_n not in roster:
-            st.error("Your email is not on the course roster.")
-            st.stop()
+def _ensure_dir(path: Path) -> None:
+    path.mkdir(parents=True, exist_ok=True)
 
-        st.session_state["authorized"] = True
-        st.session_state["user_email"] = email_n
-        st.success("Login successful.")
-        st.rerun()
 
-    st.stop()
+def _data_root() -> Path:
+    root = Path(DEFAULT_DATA_DIR)
+    _ensure_dir(root)
+    return root
 
-# ===== GLOBAL UI FIX: HIDE STREAMLIT DEFAULT NAV =====
-def apply_global_styles():
-    st.markdown(
-        """
-        <style>
-        [data-testid="stSidebarNav"] { display: none !important; }
-        [data-testid="stSidebarNavItems"] { display: none !important; }
-        [data-testid="stSidebarNavSeparator"] { display: none !important; }
-        section[data-testid="stSidebar"] nav { display: none !important; }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
 
-# ===== TOP BAR =====
-def render_top_bar(title: str):
-    col_left, col_right = st.columns([6, 2])
+def _identity() -> Dict[str, Any]:
+    if IDENTITY_STATE_KEY not in st.session_state:
+        st.session_state[IDENTITY_STATE_KEY] = {
+            "confirmed": False,
+            "name": "",
+            "email": "",
+            "student_id": "",
+            "student_hash": "",
+            "created_at": "",
+            "last_seen": "",
+        }
+    return st.session_state[IDENTITY_STATE_KEY]
 
-    with col_left:
+
+# -----------------------------
+# Public API
+# -----------------------------
+def init_auth() -> None:
+    """
+    Call this once near the top of each page (or in app.py) to ensure state exists.
+    """
+    _identity()  # ensures session_state structure exists
+    ident = _identity()
+    ident["last_seen"] = _now_iso()
+    st.session_state[IDENTITY_STATE_KEY] = ident
+
+
+def is_authenticated() -> bool:
+    """
+    Returns True once the student has confirmed identity.
+    """
+    ident = _identity()
+    return bool(ident.get("confirmed") and ident.get("name") and ident.get("student_hash"))
+
+
+def get_student_identity() -> Dict[str, Any]:
+    """
+    Get the stored identity dict (name/email/id/hash/etc).
+    """
+    return _identity()
+
+
+def student_storage_dir() -> Path:
+    """
+    Per-student directory for submissions/logs.
+    """
+    ident = _identity()
+    base = _data_root() / "students"
+    _ensure_dir(base)
+
+    # If not confirmed yet, store in a temp bucket (rarely used).
+    if not ident.get("student_hash"):
+        temp = base / "unconfirmed"
+        _ensure_dir(temp)
+        return temp
+
+    folder = f"{_safe_slug(ident.get('name','student'))}_{ident['student_hash']}"
+    path = base / folder
+    _ensure_dir(path)
+    return path
+
+
+def course_event_log_path() -> Path:
+    """
+    Global event log file (append-only JSONL).
+    """
+    root = _data_root() / "logs"
+    _ensure_dir(root)
+    return root / "events.jsonl"
+
+
+def log_event(event_type: str, payload: Optional[Dict[str, Any]] = None) -> None:
+    """
+    Append an event to global + student logs.
+    """
+    payload = payload or {}
+    ident = _identity()
+
+    record = {
+        "ts": _now_iso(),
+        "event": event_type,
+        "student_name": ident.get("name", ""),
+        "student_email": ident.get("email", ""),
+        "student_id": ident.get("student_id", ""),
+        "student_hash": ident.get("student_hash", ""),
+        "payload": payload,
+    }
+
+    # Global log
+    global_path = course_event_log_path()
+    with global_path.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(record, ensure_ascii=False) + "\n")
+
+    # Student log
+    sdir = student_storage_dir()
+    spath = sdir / "events.jsonl"
+    with spath.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(record, ensure_ascii=False) + "\n")
+
+
+def render_identity_sidebar(
+    *,
+    title: str = "Student Access",
+    require_email: bool = REQUIRE_EMAIL_DEFAULT,
+    require_student_id: bool = False,
+    show_reset: bool = True,
+) -> None:
+    """
+    Sidebar UI for identity entry + confirm button.
+    Put this on every page to keep things consistent for students.
+    """
+    init_auth()
+    ident = _identity()
+
+    with st.sidebar:
         st.markdown(f"### {title}")
 
-    with col_right:
-        st.markdown(
-            f"<div style='text-align:right; font-size:0.85em;'>"
-            f"Signed in as <b>{st.session_state.get('user_email','')}</b>"
-            f"</div>",
-            unsafe_allow_html=True
-        )
-        if st.button("Log out", use_container_width=True):
-            logout()
+        if is_authenticated():
+            st.success("Identity confirmed")
+            st.write(f"**Name:** {ident.get('name','')}")
+            if ident.get("email"):
+                st.write(f"**Email:** {ident.get('email','')}")
+            if ident.get("student_id"):
+                st.write(f"**ID:** {ident.get('student_id','')}")
 
-    st.divider()
+            if show_reset:
+                if st.button("Reset identity", use_container_width=True):
+                    reset_identity()
+                    st.rerun()
+            return
 
-# ===== PAGE DISCOVERY =====
-def _label_from_filename(filename: str) -> str:
-    # "00_Course Overview.py" -> "Course Overview"
-    # "01_Module 1.py" -> "Module 1"
-    base = filename.replace(".py", "")
-    base = base.replace("_", " ").strip()
-    base = re.sub(r"^\d+\s*", "", base).strip()  # remove leading number
-    return base
+        st.info("Enter your info and click **Confirm / Start**. This unlocks downloads and submissions.")
 
-def _sort_key(path: Path):
-    m = re.match(r"^(\d+)_", path.name)
-    return (int(m.group(1)) if m else 10_000, path.name.lower())
+        name = st.text_input("Full name", value=ident.get("name", ""), placeholder="e.g., Jane Smith")
+        email = ""
+        sid = ""
+        if require_email:
+            email = st.text_input("Email", value=ident.get("email", ""), placeholder="e.g., jsmith@school.edu")
+        else:
+            # still allow optional
+            email = st.text_input("Email (optional)", value=ident.get("email", ""), placeholder="optional")
 
-@st.cache_data
-def build_pages_index():
-    detected = {"Home": "app.py"}
+        if require_student_id:
+            sid = st.text_input("Student ID", value=ident.get("student_id", ""), placeholder="optional or required")
+        else:
+            sid = st.text_input("Student ID (optional)", value=ident.get("student_id", ""), placeholder="optional")
 
-    if PAGES_DIR.exists():
-        for p in sorted(PAGES_DIR.glob("*.py"), key=_sort_key):
-            if p.name.startswith("__"):
-                continue
-            label = _label_from_filename(p.name)
-            detected[label] = str(p).replace("\\", "/")
+        confirm = st.button("Confirm / Start", type="primary", use_container_width=True)
 
-    # Force intended order:
-    ordered = {}
-    ordered["Home"] = detected["Home"]
-    if "Course Overview" in detected:
-        ordered["Course Overview"] = detected["Course Overview"]
+        if confirm:
+            name_ok = bool(name.strip())
+            email_ok = True
+            sid_ok = True
 
-    for i in range(1, 14):
-        k = f"Module {i}"
-        if k in detected:
-            ordered[k] = detected[k]
+            if require_email:
+                email_ok = bool(email.strip()) and ("@" in email)
 
-    for k, v in detected.items():
-        if k in ordered:
-            continue
-        ordered[k] = v
+            if require_student_id:
+                sid_ok = bool(sid.strip())
 
-    return ordered
+            if not name_ok:
+                st.error("Please enter your full name.")
+                return
+            if not email_ok:
+                st.error("Please enter a valid email address.")
+                return
+            if not sid_ok:
+                st.error("Please enter your student ID.")
+                return
 
-# ===== PATH RESOLUTION (prevents "click -> Home" loop) =====
-def _canonicalize_filename(path: str) -> str:
-    # compare by filename ignoring spaces/underscores/case
-    name = Path(path).name.lower()
-    name = re.sub(r"[\s_]+", "", name)
-    return name
+            ident["name"] = name.strip()
+            ident["email"] = email.strip()
+            ident["student_id"] = sid.strip()
+            ident["student_hash"] = _hash_id(ident["name"], ident["email"])
+            ident["confirmed"] = True
+            ident["created_at"] = ident["created_at"] or _now_iso()
+            ident["last_seen"] = _now_iso()
+            st.session_state[IDENTITY_STATE_KEY] = ident
 
-def resolve_current_path(page_path: str) -> str:
-    pages = build_pages_index()
-    vals = list(pages.values())
+            # Ensure directories exist + log
+            _ = student_storage_dir()
+            log_event("identity_confirmed", {"require_email": require_email, "require_student_id": require_student_id})
 
-    # exact
-    if page_path in vals:
-        return page_path
+            st.success("Confirmed! You can now continue.")
+            st.rerun()
 
-    # filename match (case-insensitive)
-    want = Path(page_path).name.lower()
-    for v in vals:
-        if Path(v).name.lower() == want:
-            return v
 
-    # canonical match (spaces/underscores ignored)
-    want2 = _canonicalize_filename(page_path)
-    for v in vals:
-        if _canonicalize_filename(v) == want2:
-            return v
-
-    return page_path
-
-def set_current_page(page_path: str):
-    st.session_state["current_page_path"] = resolve_current_path(page_path)
-
-# ===== SIDEBAR =====
-def render_course_sidebar():
-    st.sidebar.markdown("## 📚 Course Contents")
-
-    pages = build_pages_index()
-    labels = list(pages.keys())
-
-    current = resolve_current_path(st.session_state.get("current_page_path", "app.py"))
-
-    vals = list(pages.values())
-    try:
-        default_index = vals.index(current)
-    except ValueError:
-        default_index = 0
-
-    choice = st.sidebar.radio(
-        label="",
-        options=labels,
-        index=default_index,
-        key="course_contents_choice",
-        label_visibility="collapsed",
-    )
-
-    target = pages[choice]
-
-    # Important: only switch if the target is different (prevents loops)
-    if resolve_current_path(target) != resolve_current_path(current):
-        st.switch_page(target)
-
-    # Course Overview sub-navigation only when you are actually on that page
-    course_overview_path = pages.get("Course Overview", "")
-    overview_section = st.session_state.get("course_overview_section", "✅ Start Here (Checklist)")
-
-    if (
-        choice == "Course Overview"
-        and resolve_current_path(current) == resolve_current_path(course_overview_path)
-    ):
-        st.sidebar.markdown("---")
-        st.sidebar.markdown("### Course Overview Navigation")
-
-        st.sidebar.markdown("**Student Info**")
-        st.sidebar.text_input(
-            "Your full name (used for downloads):",
-            key="student_full_name",
-            placeholder="Type your name here..."
-        )
-
-        st.sidebar.markdown("**Choose a section:**")
-        overview_section = st.sidebar.radio(
-            label="",
-            options=[
-                "✅ Start Here (Checklist)",
-                "📌 Course Subjects (At a Glance)",
-                "📄 Download Course Syllabus",
-                "🎥 Course Overview Video + Questions",
-                "📝 Introduction Reflection",
-            ],
-            key="course_overview_section",
-            label_visibility="collapsed",
-        )
-
-    return choice, overview_section
-
-# ===== INIT =====
-def init_course_page(title: str, page_path: str):
+def require_identity(
+    *,
+    require_email: bool = REQUIRE_EMAIL_DEFAULT,
+    require_student_id: bool = False,
+    block_message: str = "Please confirm your identity in the sidebar to access this page.",
+) -> bool:
     """
-    Call this at the top of every page.
-    Returns selected Course Overview section (only meaningful on Course Overview page).
+    Call near the top of a page. If not confirmed, it blocks the page content.
+    Returns True if confirmed.
     """
-    apply_global_styles()
-    require_access()
-    set_current_page(page_path)
-    render_top_bar(title)
-    _, overview_section = render_course_sidebar()
-    return overview_section
+    render_identity_sidebar(require_email=require_email, require_student_id=require_student_id)
+    if not is_authenticated():
+        st.warning(block_message)
+        st.stop()
+    return True
+
+
+def reset_identity() -> None:
+    """
+    Clear identity from the session (useful if student typed wrong name).
+    """
+    st.session_state[IDENTITY_STATE_KEY] = {
+        "confirmed": False,
+        "name": "",
+        "email": "",
+        "student_id": "",
+        "student_hash": "",
+        "created_at": "",
+        "last_seen": "",
+    }
+    log_event("identity_reset", {})
+
+
+# -----------------------------
+# Submission utilities
+# -----------------------------
+def save_uploaded_file(
+    uploaded_file,
+    *,
+    assignment_key: str,
+    subfolder: str = "submissions",
+    keep_original_name: bool = True,
+) -> Path:
+    """
+    Save an uploaded file into the student's folder.
+    Example usage:
+        f = st.file_uploader("Upload", type=["pdf","docx"])
+        if f and st.button("Submit"):
+            path = save_uploaded_file(f, assignment_key="m1_quiz1")
+    """
+    if not is_authenticated():
+        raise RuntimeError("Identity not confirmed. Call require_identity() first.")
+
+    sdir = student_storage_dir() / subfolder / assignment_key
+    _ensure_dir(sdir)
+
+    filename = uploaded_file.name if keep_original_name else "upload.bin"
+    safe_name = re.sub(r"[^A-Za-z0-9._-]+", "_", filename).strip("_")
+    outpath = sdir / safe_name
+
+    with outpath.open("wb") as f:
+        f.write(uploaded_file.getbuffer())
+
+    log_event("file_submitted", {"assignment_key": assignment_key, "filename": safe_name})
+    return outpath
+
+
+def save_text_submission(
+    text: str,
+    *,
+    assignment_key: str,
+    filename: str = "response.txt",
+    subfolder: str = "submissions",
+) -> Path:
+    """
+    Save a text response for an assignment into student's folder.
+    """
+    if not is_authenticated():
+        raise RuntimeError("Identity not confirmed. Call require_identity() first.")
+
+    sdir = student_storage_dir() / subfolder / assignment_key
+    _ensure_dir(sdir)
+
+    safe_name = re.sub(r"[^A-Za-z0-9._-]+", "_", filename).strip("_")
+    outpath = sdir / safe_name
+
+    with outpath.open("w", encoding="utf-8") as f:
+        f.write(text)
+
+    log_event("text_submitted", {"assignment_key": assignment_key, "filename": safe_name})
+    return outpath
+
+
+# -----------------------------
+# Instructor-only (optional)
+# -----------------------------
+def instructor_gate(label: str = "Instructor access") -> bool:
+    """
+    OPTIONAL. Simple PIN gate for instructor-only views.
+    Set env var INSTRUCTOR_PIN to enable.
+    """
+    pin = os.getenv(INSTRUCTOR_PIN_ENV, "").strip()
+    if not pin:
+        # Not configured: treat as disabled
+        return False
+
+    with st.sidebar:
+        st.markdown("### Instructor")
+        entered = st.text_input(label, type="password", placeholder="PIN")
+        if entered and entered == pin:
+            st.success("Instructor access granted")
+            return True
+    return False
