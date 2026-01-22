@@ -1,8 +1,4 @@
 # auth.py
-# Lightweight identity + submission utilities for a Streamlit course app.
-# Purpose: make students enter identity ONCE, persist it across pages,
-# and use it to name/download/submit assignments reliably.
-
 from __future__ import annotations
 
 import os
@@ -11,24 +7,17 @@ import json
 import time
 import hashlib
 from pathlib import Path
-from typing import Optional, Dict, Any, Tuple
+from typing import Optional, Dict, Any
 
 import streamlit as st
 
-
-# -----------------------------
-# Configuration
-# -----------------------------
-DEFAULT_DATA_DIR = "data"  # stored in the app working directory
+DEFAULT_DATA_DIR = "data"
 IDENTITY_STATE_KEY = "student_identity"
-APP_SALT_ENV = "COURSE_APP_SALT"          # optional: set in Streamlit secrets/env
-INSTRUCTOR_PIN_ENV = "INSTRUCTOR_PIN"    # optional: instructor-only area
-REQUIRE_EMAIL_DEFAULT = False            # you can override per page call
+APP_SALT_ENV = "COURSE_APP_SALT"
+
+REQUIRE_EMAIL_DEFAULT = False
 
 
-# -----------------------------
-# Helpers
-# -----------------------------
 def _now_iso() -> str:
     return time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime())
 
@@ -41,8 +30,6 @@ def _safe_slug(text: str, max_len: int = 64) -> str:
 
 
 def _get_salt() -> str:
-    # Salt improves stability of generated ids across runs while avoiding obvious IDs.
-    # Use env var if set; otherwise a constant fallback is okay for a class tool.
     return os.getenv(APP_SALT_ENV, "streamlit-course-salt")
 
 
@@ -75,43 +62,27 @@ def _identity() -> Dict[str, Any]:
     return st.session_state[IDENTITY_STATE_KEY]
 
 
-# -----------------------------
-# Public API
-# -----------------------------
 def init_auth() -> None:
-    """
-    Call this once near the top of each page (or in app.py) to ensure state exists.
-    """
-    _identity()  # ensures session_state structure exists
+    _identity()
     ident = _identity()
     ident["last_seen"] = _now_iso()
     st.session_state[IDENTITY_STATE_KEY] = ident
 
 
 def is_authenticated() -> bool:
-    """
-    Returns True once the student has confirmed identity.
-    """
     ident = _identity()
     return bool(ident.get("confirmed") and ident.get("name") and ident.get("student_hash"))
 
 
 def get_student_identity() -> Dict[str, Any]:
-    """
-    Get the stored identity dict (name/email/id/hash/etc).
-    """
     return _identity()
 
 
 def student_storage_dir() -> Path:
-    """
-    Per-student directory for submissions/logs.
-    """
     ident = _identity()
     base = _data_root() / "students"
     _ensure_dir(base)
 
-    # If not confirmed yet, store in a temp bucket (rarely used).
     if not ident.get("student_hash"):
         temp = base / "unconfirmed"
         _ensure_dir(temp)
@@ -124,18 +95,12 @@ def student_storage_dir() -> Path:
 
 
 def course_event_log_path() -> Path:
-    """
-    Global event log file (append-only JSONL).
-    """
     root = _data_root() / "logs"
     _ensure_dir(root)
     return root / "events.jsonl"
 
 
 def log_event(event_type: str, payload: Optional[Dict[str, Any]] = None) -> None:
-    """
-    Append an event to global + student logs.
-    """
     payload = payload or {}
     ident = _identity()
 
@@ -161,6 +126,19 @@ def log_event(event_type: str, payload: Optional[Dict[str, Any]] = None) -> None
         f.write(json.dumps(record, ensure_ascii=False) + "\n")
 
 
+def reset_identity() -> None:
+    st.session_state[IDENTITY_STATE_KEY] = {
+        "confirmed": False,
+        "name": "",
+        "email": "",
+        "student_id": "",
+        "student_hash": "",
+        "created_at": "",
+        "last_seen": "",
+    }
+    log_event("identity_reset", {})
+
+
 def render_identity_sidebar(
     *,
     title: str = "Student Access",
@@ -168,10 +146,6 @@ def render_identity_sidebar(
     require_student_id: bool = False,
     show_reset: bool = True,
 ) -> None:
-    """
-    Sidebar UI for identity entry + confirm button.
-    Put this on every page to keep things consistent for students.
-    """
     init_auth()
     ident = _identity()
 
@@ -185,7 +159,6 @@ def render_identity_sidebar(
                 st.write(f"**Email:** {ident.get('email','')}")
             if ident.get("student_id"):
                 st.write(f"**ID:** {ident.get('student_id','')}")
-
             if show_reset:
                 if st.button("Reset identity", use_container_width=True):
                     reset_identity()
@@ -195,39 +168,25 @@ def render_identity_sidebar(
         st.info("Enter your info and click **Confirm / Start**. This unlocks downloads and submissions.")
 
         name = st.text_input("Full name", value=ident.get("name", ""), placeholder="e.g., Jane Smith")
-        email = ""
-        sid = ""
+
         if require_email:
             email = st.text_input("Email", value=ident.get("email", ""), placeholder="e.g., jsmith@school.edu")
         else:
-            # still allow optional
             email = st.text_input("Email (optional)", value=ident.get("email", ""), placeholder="optional")
 
         if require_student_id:
-            sid = st.text_input("Student ID", value=ident.get("student_id", ""), placeholder="optional or required")
+            sid = st.text_input("Student ID", value=ident.get("student_id", ""), placeholder="required")
         else:
             sid = st.text_input("Student ID (optional)", value=ident.get("student_id", ""), placeholder="optional")
 
-        confirm = st.button("Confirm / Start", type="primary", use_container_width=True)
-
-        if confirm:
-            name_ok = bool(name.strip())
-            email_ok = True
-            sid_ok = True
-
-            if require_email:
-                email_ok = bool(email.strip()) and ("@" in email)
-
-            if require_student_id:
-                sid_ok = bool(sid.strip())
-
-            if not name_ok:
+        if st.button("Confirm / Start", type="primary", use_container_width=True):
+            if not name.strip():
                 st.error("Please enter your full name.")
                 return
-            if not email_ok:
+            if require_email and (not email.strip() or "@" not in email):
                 st.error("Please enter a valid email address.")
                 return
-            if not sid_ok:
+            if require_student_id and not sid.strip():
                 st.error("Please enter your student ID.")
                 return
 
@@ -240,11 +199,10 @@ def render_identity_sidebar(
             ident["last_seen"] = _now_iso()
             st.session_state[IDENTITY_STATE_KEY] = ident
 
-            # Ensure directories exist + log
             _ = student_storage_dir()
             log_event("identity_confirmed", {"require_email": require_email, "require_student_id": require_student_id})
 
-            st.success("Confirmed! You can now continue.")
+            st.success("Confirmed!")
             st.rerun()
 
 
@@ -254,10 +212,6 @@ def require_identity(
     require_student_id: bool = False,
     block_message: str = "Please confirm your identity in the sidebar to access this page.",
 ) -> bool:
-    """
-    Call near the top of a page. If not confirmed, it blocks the page content.
-    Returns True if confirmed.
-    """
     render_identity_sidebar(require_email=require_email, require_student_id=require_student_id)
     if not is_authenticated():
         st.warning(block_message)
@@ -265,25 +219,6 @@ def require_identity(
     return True
 
 
-def reset_identity() -> None:
-    """
-    Clear identity from the session (useful if student typed wrong name).
-    """
-    st.session_state[IDENTITY_STATE_KEY] = {
-        "confirmed": False,
-        "name": "",
-        "email": "",
-        "student_id": "",
-        "student_hash": "",
-        "created_at": "",
-        "last_seen": "",
-    }
-    log_event("identity_reset", {})
-
-
-# -----------------------------
-# Submission utilities
-# -----------------------------
 def save_uploaded_file(
     uploaded_file,
     *,
@@ -291,13 +226,6 @@ def save_uploaded_file(
     subfolder: str = "submissions",
     keep_original_name: bool = True,
 ) -> Path:
-    """
-    Save an uploaded file into the student's folder.
-    Example usage:
-        f = st.file_uploader("Upload", type=["pdf","docx"])
-        if f and st.button("Submit"):
-            path = save_uploaded_file(f, assignment_key="m1_quiz1")
-    """
     if not is_authenticated():
         raise RuntimeError("Identity not confirmed. Call require_identity() first.")
 
@@ -322,9 +250,6 @@ def save_text_submission(
     filename: str = "response.txt",
     subfolder: str = "submissions",
 ) -> Path:
-    """
-    Save a text response for an assignment into student's folder.
-    """
     if not is_authenticated():
         raise RuntimeError("Identity not confirmed. Call require_identity() first.")
 
@@ -339,25 +264,3 @@ def save_text_submission(
 
     log_event("text_submitted", {"assignment_key": assignment_key, "filename": safe_name})
     return outpath
-
-
-# -----------------------------
-# Instructor-only (optional)
-# -----------------------------
-def instructor_gate(label: str = "Instructor access") -> bool:
-    """
-    OPTIONAL. Simple PIN gate for instructor-only views.
-    Set env var INSTRUCTOR_PIN to enable.
-    """
-    pin = os.getenv(INSTRUCTOR_PIN_ENV, "").strip()
-    if not pin:
-        # Not configured: treat as disabled
-        return False
-
-    with st.sidebar:
-        st.markdown("### Instructor")
-        entered = st.text_input(label, type="password", placeholder="PIN")
-        if entered and entered == pin:
-            st.success("Instructor access granted")
-            return True
-    return False
