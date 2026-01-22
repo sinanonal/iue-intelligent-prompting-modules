@@ -1,12 +1,9 @@
 import streamlit as st
 from auth import require_access, render_top_bar
 
-# 🔐 MUST BE FIRST
 require_access()
 render_top_bar("Course Overview")
 
-# ---- page content ----
-st.write("Course overview content here.")
 
 
 
