@@ -1,5 +1,14 @@
 
 import streamlit as st
+from auth import require_access
+
+require_access()
+
+st.write("Home page content here")
+
+
+
+import streamlit as st
 
 st.set_page_config(
     page_title="Home — Intelligent Prompting",
