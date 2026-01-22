@@ -1,15 +1,17 @@
+import streamlit as st
 from auth import require_access, render_top_bar, render_course_sidebar
 
+st.set_page_config(page_title="Module 1", layout="wide")
+
+st.markdown("""
+<style>
+[data-testid="stSidebarNav"] { display: none; }
+</style>
+""", unsafe_allow_html=True)
+
 require_access()
-render_top_bar("Home Page")          # change title per page
+render_top_bar("Module 1 — Foundations")
 render_course_sidebar()
-
-
-import streamlit as st
-from auth import require_access, render_top_bar
-
-require_access()
-render_top_bar("Module 1 – Foundations")
 
 
 # -----------------------------------------
