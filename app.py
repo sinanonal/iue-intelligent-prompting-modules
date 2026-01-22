@@ -65,6 +65,33 @@ if page == "🎧 Lecture Video / Voice Recording":
 *Replace this placeholder with your real transcript after recording the lecture.*
 """)
 
+# ===== YuJa-style Interactive Quiz Questions =====
+st.markdown("---")
+st.markdown("## 🧠 Interactive Video Quiz")
+
+# Question 1
+st.markdown("### **1. Please briefly introduce yourself — your major, hometown, interests, etc.**")
+intro_answer = st.text_area("Your response:", key="q1_intro", height=120)
+
+if st.button("Submit Answer 1"):
+    if intro_answer.strip():
+        st.success("Thank you for sharing your introduction! This helps the instructor get to know you.")
+    else:
+        st.warning("Please enter your introduction before submitting.")
+
+st.markdown("---")
+
+# Question 2
+st.markdown("### **2. What did you notice in this slide?**")
+slide_answer = st.text_area("Your response:", key="q2_slide", height=120)
+
+if st.button("Submit Answer 2"):
+    if slide_answer.strip():
+        st.success("Thank you! Your observation has been recorded.")
+    else:
+        st.warning("Please describe what you noticed before submitting.")
+
+  
     # QUIZ
     st.markdown("---")
     st.markdown("### 🧠 Quick Knowledge Check")
