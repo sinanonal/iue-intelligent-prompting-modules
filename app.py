@@ -657,7 +657,7 @@ You can return here anytime to see what is still missing.
     status_line(150 <= refl_wc <= 250, "Write the 150–250 word Module Reflection")
 
     st.markdown("---")
-    st.markdown("### ⬇️ Download Your Responses")
+    st.markdown("### ⬇️ Download Your Responses (Quizzes+Prompt Lab+Reflection)")
     section_download_block()
     goto_module_2_button()
 
@@ -843,7 +843,7 @@ elif page == "🧪 Prompt Lab (ChatGPT Practice)":
             st.success("Prompt Lab looks complete. You can download your responses below.")
 
     st.markdown("---")
-    st.markdown("### ⬇️ Download Your Responses")
+    st.markdown("### ⬇️ Download Your Responses (Quizzes+Prompt Lab+Reflection)")
     section_download_block()
 
     goto_module_2_button()
@@ -876,7 +876,7 @@ Submit a **150–250 word** reflection:
             st.warning("Write a reflection to preview.")
 
     st.markdown("---")
-    st.markdown("### ⬇️ Download Your Responses")
+    st.markdown("### ⬇️ Download Your Responses (Quizzes+Prompt Lab+Reflection)")
     section_download_block()
 
     goto_module_2_button()
