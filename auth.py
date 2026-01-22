@@ -1,3 +1,22 @@
+def render_top_bar(title: str):
+    col_left, col_right = st.columns([6, 2])
+
+    with col_left:
+        st.markdown(f"### {title}")
+
+    with col_right:
+        st.markdown(
+            f"<div style='text-align:right; font-size:0.85em;'>"
+            f"Signed in as <b>{st.session_state['user_email']}</b>"
+            f"</div>",
+            unsafe_allow_html=True
+        )
+        if st.button("Log out", use_container_width=True):
+            logout()
+
+    st.divider()
+
+
 import streamlit as st
 import pandas as pd
 from datetime import date
