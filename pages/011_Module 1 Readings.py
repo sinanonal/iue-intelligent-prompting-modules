@@ -1,4 +1,3 @@
-# pages/02_Module_1_Readings.py
 import streamlit as st
 import auth
 from content import MODULE1_READINGS
@@ -8,7 +7,6 @@ auth.require_identity(require_email=False)
 
 st.title("Module 1 Readings")
 
-# Sidebar reading navigation (titles visible)
 reading_choice = st.sidebar.radio(
     "Choose a reading section:",
     list(MODULE1_READINGS.keys()),
@@ -17,7 +15,7 @@ reading_choice = st.sidebar.radio(
 
 st.markdown(MODULE1_READINGS[reading_choice])
 
-# Manual confirmation for progress (no auto-check)
+# Manual confirmation (no auto-check)
 if "module1_readings_progress" not in st.session_state:
     st.session_state.module1_readings_progress = {}
 
