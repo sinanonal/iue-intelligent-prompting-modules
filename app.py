@@ -1,3 +1,15 @@
+import streamlit as st
+import pandas as pd
+from datetime import date
+
+@st.cache_data
+def load_roster_from_upload(uploaded_file):
+    df = pd.read_csv(uploaded_file)
+    if "email" not in df.columns:
+        raise ValueError("CSV must have an 'email' column.")
+    return {str(e).strip().lower() for e in df["email"].dropna()}
+
+
 
 @st.cache_data
 def load_roster_from_upload(uploaded_file):
