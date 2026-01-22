@@ -1,7 +1,12 @@
 import streamlit as st
-import io
-import csv
-from datetime import datetime
+from auth import require_access
+
+require_access()
+
+st.title("Home")
+st.write("Now the full app is visible.")
+
+
 
 # -----------------------------------------
 #   TIER 1 — Foundations of Generative AI
