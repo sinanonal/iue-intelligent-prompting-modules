@@ -51,7 +51,7 @@ if page == "🎧 Lecture Video / Voice Recording":
                 mime="application/pdf"
             )
     except:
-        st.warning("PDF notes not found. Add your file to `notes/module1_notes.pdf`.")
+        st.warning("PDF notes not found. Add your file to `notes/Intelligent_Prompting.pdf`.")
 
     # VIDEO
     st.markdown("### 📺 Video Lecture")
