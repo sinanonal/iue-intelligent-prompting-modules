@@ -1,3 +1,10 @@
+from auth import require_access, render_top_bar, render_course_sidebar
+
+require_access()
+render_top_bar("Home Page")          # change title per page
+render_course_sidebar()
+
+
 import streamlit as st
 from auth import require_access, render_top_bar
 
