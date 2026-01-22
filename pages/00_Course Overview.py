@@ -144,8 +144,7 @@ Complete these items in order. After finishing, download your responses if requi
     col1, col2 = st.columns(2)
     with col1:
         st.page_link("pages/01_Module 1.py", label="➡️ Go to Module 1")
-    with col2:
-        st.page_link("app.py", label="🏠 Back to Home")
+    
 
 # =======================================================
 # 2) COURSE SUBJECTS (requires explicit acknowledgement)
