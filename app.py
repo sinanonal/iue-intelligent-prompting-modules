@@ -1,14 +1,11 @@
 import streamlit as st
-from auth import require_access, logout
-
-import streamlit as st
 from auth import require_access, render_top_bar
 
 require_access()
 render_top_bar("Intelligent Prompting Course App")
 
+# ---- rest of your app ----
 st.write("Home page content here.")
-
 
 
 # ===== PAGE CONTENT =====
