@@ -705,9 +705,7 @@ elif page == "🎧 Lecture Video / Voice Recording":
         else:
             st.warning("Please answer both questions before submitting.")
 
-    st.markdown("---")
-    st.markdown("### ⬇️ Download Your Responses")
-    section_download_block()
+    
 
     goto_module_2_button()
 
