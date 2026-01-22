@@ -43,7 +43,7 @@ if page == "🎧 Lecture Video / Voice Recording":
     # PDF NOTES
     st.markdown("### 📄 Downloadable PDF Notes")
     try:
-        with open("notes/Intelligent_Prompting", "rb") as pdf_file:
+        with open("notes/Intelligent_Prompting","rb") as pdf_file:
             st.download_button(
                 label="Download Module 1 Notes",
                 data=pdf_file,
