@@ -2,7 +2,7 @@ import streamlit as st
 from auth import require_access, render_top_bar
 
 require_access()
-render_top_bar("Intelligent Prompting Course App")
+render_top_bar("Home Page")
 
 
 
