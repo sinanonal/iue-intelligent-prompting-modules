@@ -56,6 +56,11 @@ When you are ready, continue to **Module 1** to start learning about generative 
 
 col1, col2 = st.columns(2)
 
-with col1:
-    if st.button("Go to Course Overview"):
-        st.switch_page("pages/00_Course Overview.py")
+def goto_Course Overview_button():
+    st.markdown("---")
+    if st.button("➡️ Go to Course Overview"):
+        try:
+            st.switch_page("pages/Mdef goto_Course Overview_button():
+    st.markdown("---")
+    
+
