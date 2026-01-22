@@ -1,14 +1,13 @@
-# auth.py
 import streamlit as st
 import pandas as pd
 from datetime import date
 
-# ====== SETTINGS ======
-SEMESTER_END = date(2026, 5, 15)     # change each semester
-ROSTER_PATH = "roster.csv"           # put roster.csv next to app.py
-ALLOWED_DOMAIN = "@siue.edu"         # optional
+# ===== SETTINGS =====
+SEMESTER_END = date(2026, 5, 15)
+ROSTER_PATH = "roster.csv"
+ALLOWED_DOMAIN = "@siue.edu"
 
-# ====== HELPERS ======
+# ===== HELPERS =====
 def _norm_email(x: str) -> str:
     return (x or "").strip().lower()
 
@@ -17,35 +16,29 @@ def _load_roster(path: str) -> set[str]:
     df = pd.read_csv(path)
     if "email" not in df.columns:
         raise ValueError("Roster CSV must include a column named 'email'.")
-    return {_norm_email(e) for e in df["email"].dropna().tolist()}
+    return {_norm_email(e) for e in df["email"].dropna()}
 
 def logout():
-    # Clear only auth-related session keys (safe)
     for k in ["authorized", "user_email"]:
         if k in st.session_state:
             del st.session_state[k]
     st.rerun()
 
 def require_access():
-    # 1) Semester cutoff
+    # Semester cutoff
     if date.today() > SEMESTER_END:
         st.error("This course app is no longer available (semester access has ended).")
         st.stop()
 
-    # 2) Session defaults
+    # Session defaults
     st.session_state.setdefault("authorized", False)
     st.session_state.setdefault("user_email", "")
 
-    # 3) If authorized, show logout + proceed
+    # Already logged in → allow page to render
     if st.session_state["authorized"]:
-        with st.sidebar:
-            st.markdown("### Account")
-            st.write(st.session_state["user_email"])
-            if st.button("Log out", use_container_width=True):
-                logout()
         return
 
-    # 4) Not authorized: show login screen and STOP the rest of the page
+    # Login screen
     roster = _load_roster(ROSTER_PATH)
 
     st.title("Course App Login")
@@ -65,7 +58,7 @@ def require_access():
             st.stop()
 
         if email_n not in roster:
-            st.error("Your email is not on the course roster. If you just added the class, contact the instructor.")
+            st.error("Your email is not on the course roster.")
             st.stop()
 
         st.session_state["authorized"] = True
@@ -73,4 +66,5 @@ def require_access():
         st.success("Login successful.")
         st.rerun()
 
+    # IMPORTANT: stop page execution until logged in
     st.stop()
