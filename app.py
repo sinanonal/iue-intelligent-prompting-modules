@@ -6,7 +6,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-st.title("📘 IIntelligent Prompting: Using AI for Creative and Analytical Thinking")
+st.title("📘 Intelligent Prompting: Using AI for Creative and Analytical Thinking")
 st.header("Welcome")
 
 st.markdown("""
