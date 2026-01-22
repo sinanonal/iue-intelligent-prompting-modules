@@ -1,11 +1,10 @@
-# pages/03_Submit_Assignments.py
 import streamlit as st
 import auth
 
 st.set_page_config(page_title="Submit Assignments", layout="wide")
 auth.require_identity(require_email=False)
 
-st.title("Submit Assignments")
+st.title("Submit Assignments — Module 1")
 
 st.markdown("### Module 1 Reflection (text submission)")
 reflection = st.text_area(
@@ -14,13 +13,7 @@ reflection = st.text_area(
     placeholder="What did you learn from the readings? What surprised you? What will you try next?"
 )
 
-col1, col2 = st.columns([1, 2])
-with col1:
-    submit_reflection = st.button("Submit reflection", type="primary")
-with col2:
-    st.caption("Your submission is saved under your student folder using the name you confirmed in the sidebar.")
-
-if submit_reflection:
+if st.button("Submit reflection", type="primary"):
     if not reflection.strip():
         st.error("Please write something before submitting.")
     else:
