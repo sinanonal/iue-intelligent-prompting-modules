@@ -98,11 +98,11 @@ if page == "🎧 Lecture Video / Voice Recording":
     # -------- PDF Notes --------
     st.markdown("### 📄 Downloadable PDF Notes")
     try:
-        with open("notes/module1_notes.pdf", "rb") as pdf_file:
+        with open("notes/Intelligent_Prompting.pdf", "rb") as pdf_file:
             st.download_button(
                 label="Download Module 1 Notes",
                 data=pdf_file,
-                file_name="Module1_Notes.pdf",
+                file_name="Intelligent_Prompting.pdf",
                 mime="application/pdf"
             )
     except Exception:
@@ -111,15 +111,9 @@ if page == "🎧 Lecture Video / Voice Recording":
     # -------- Video (YouTube or YuJa via iframe) --------
     st.markdown("### 📺 Video Lecture")
     # For YuJa, replace with your iframe embed URL:
-    # st.components.v1.iframe("YOUR_YUJA_EMBED_URL", width=800, height=450)
-    st.video("https://www.youtube.com/watch?v=XXXXXXXXXXX")  # Replace with your URL, or switch to iframe above
+    # st.components.v1.iframe("Yhttps://siue.yuja.com/Dashboard/Permalink?authCode=167158588&b=14078175&linkType=video", width=800, height=450)
+    st.video("hhttps://siue.yuja.com/Dashboard/Permalink?authCode=167158588&b=14078175&linkType=video")  # Replace with your URL, or switch to iframe above
 
-    # -------- Audio --------
-    st.markdown("### 🎤 Audio Version")
-    try:
-        st.audio("lecture_audio/module1_voice_over.mp3")
-    except Exception:
-        st.warning("Audio file not found. Add your file to `lecture_audio/module1_voice_over.mp3`.")
 
     # -------- Transcript --------
     st.markdown("---")
