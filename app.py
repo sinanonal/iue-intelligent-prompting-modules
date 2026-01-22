@@ -730,9 +730,6 @@ Each section includes **3 multiple-choice questions** to check understanding.
         questions=section["mcq"]
     )
 
-    st.markdown("### ⬇️ Download Your Responses (Video + Prompt Lab + Reflection)")
-    section_download_block()
-    goto_module_2_button()
 
 # =======================================================
 # PROMPT LAB (Option A — practice in ChatGPT, paste back)
@@ -840,9 +837,6 @@ elif page == "🧪 Prompt Lab (ChatGPT Practice)":
         else:
             st.success("Prompt Lab looks complete. You can download your responses below.")
 
-    st.markdown("---")
-    st.markdown("### ⬇️ Download Your Responses (Quizzes+Prompt Lab+Reflection)")
-    section_download_block()
 
     goto_module_2_button()
 
