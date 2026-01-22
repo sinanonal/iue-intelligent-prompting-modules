@@ -55,7 +55,7 @@ if page == "🎧 Lecture Video / Voice Recording":
 
     # VIDEO
     st.markdown("### 📺 Video Lecture")
-    st.video("https://www.youtube.com/watch?v=NJ8RmgY-jP0")
+    st.video("https://siue.yuja.com/P/VideoManagement/MediaLibrary/Users/u-1S5k/MyMediaCollections/WatchVideo/62844557")
 
     
     # TRANSCRIPT
