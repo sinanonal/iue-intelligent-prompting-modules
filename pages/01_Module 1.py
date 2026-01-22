@@ -4,8 +4,6 @@ from auth import require_access, render_top_bar
 require_access()
 render_top_bar("Module 1 – Foundations")
 
-st.write("Module 1 content here.")
-
 
 # -----------------------------------------
 #   TIER 1 — Foundations of Generative AI
