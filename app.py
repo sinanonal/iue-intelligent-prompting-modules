@@ -65,9 +65,9 @@ if page == "🎧 Lecture Video / Voice Recording":
 *Replace this placeholder with your real transcript after recording the lecture.*
 """)
 
-# ===== YuJa-style Interactive Quiz Questions =====
+# =====Quiz Questions =====
 st.markdown("---")
-st.markdown("## 🧠 Interactive Video Quiz")
+st.markdown("## 🧠 Video Quiz")
 
 # Question 1
 st.markdown("### **1. Please briefly introduce yourself — your major, hometown, interests, etc.**")
@@ -90,24 +90,6 @@ if st.button("Submit Answer 2"):
         st.success("Thank you! Your observation has been recorded.")
     else:
         st.warning("Please describe what you noticed before submitting.")
-
-  
-    # QUIZ
-    st.markdown("---")
-    st.markdown("### 🧠 Quick Knowledge Check")
-    q1 = st.radio(
-        "1. Generative AI produces content by…",
-        [
-            "Understanding meaning like a human",
-            "Predicting the next likely word based on patterns",
-            "Searching the internet live for information"
-        ]
-    )
-    if q1:
-        if q1 == "Predicting the next likely word based on patterns":
-            st.success("Correct!")
-        else:
-            st.error("Not quite. Try again.")
 
     # NAVIGATION BUTTON
     st.markdown("---")
