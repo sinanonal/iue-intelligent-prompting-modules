@@ -194,7 +194,7 @@ elif page == "🎥 Course Overview Video + Questions":
     st.subheader("🎥 Course Overview Video")
 
     # Replace with your actual overview video URL (YuJa/YouTube)
-    st.video("PASTE_YOUR_COURSE_OVERVIEW_VIDEO_LINK_HERE")
+    st.video("https://siue.yuja.com/Dashboard/Permalink?authCode=167158588&b=14078175&linkType=video")
 
     st.markdown("---")
     st.subheader("🧠 Quick Questions")
