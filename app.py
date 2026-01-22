@@ -47,7 +47,7 @@ if page == "🎧 Lecture Video / Voice Recording":
             st.download_button(
                 label="Download Module 1 Notes",
                 data=pdf_file,
-                file_name="Module1_Notes.pdf",
+                file_name="Intelligent_Prompting.pdf",
                 mime="application/pdf"
             )
     except:
