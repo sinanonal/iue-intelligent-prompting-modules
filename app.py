@@ -1,11 +1,10 @@
-
 import streamlit as st
 from auth import require_access
 
 require_access()
 
-st.write("Home page content here")
-
+st.title("Home")
+st.write("Now the full app is visible.")
 
 
 import streamlit as st
