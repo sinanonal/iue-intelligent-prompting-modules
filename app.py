@@ -56,7 +56,7 @@ When you are ready, continue to **Module 1** to start learning about generative 
 
 st.markdown("---")
 
-col1, col2 = st.columns(2)
+col1 = st.columns(1)
 
 with col1:
     if st.button("➡️ Go to Course Overview", use_container_width=True):
