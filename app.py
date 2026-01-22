@@ -4,22 +4,6 @@ from auth import require_access, render_top_bar
 require_access()
 render_top_bar("Intelligent Prompting Course App")
 
-# ---- rest of your app ----
-st.write("Home page content here.")
-
-
-# ===== PAGE CONTENT =====
-st.title("Home")
-st.write("Main content starts here.")
-
-
-import streamlit as st
-from auth import require_access
-
-require_access()
-
-st.title("Home")
-st.write("Now the full app is visible.")
 
 
 import streamlit as st
