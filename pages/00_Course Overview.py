@@ -140,7 +140,6 @@ Complete these items in order. After finishing, download your responses if requi
     overview_download_block()
 
     st.markdown("---")
-    st.subheader("🚀 Continue")
     col1, col2 = st.columns(2)
     with col1:
         st.page_link("pages/01_Module 1.py", label="➡️ Go to Module 1")
