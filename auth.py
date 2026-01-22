@@ -23,7 +23,14 @@ def _load_roster(path: str) -> set[str]:
     return {_norm_email(e) for e in df["email"].dropna()}
 
 def logout():
-    for k in ["authorized", "user_email", "current_page_path"]:
+    for k in [
+        "authorized",
+        "user_email",
+        "current_page_path",
+        "course_contents_choice",
+        "course_overview_section",
+        "student_full_name",
+    ]:
         st.session_state.pop(k, None)
     st.rerun()
 
@@ -72,12 +79,9 @@ def apply_global_styles():
     st.markdown(
         """
         <style>
-        /* Streamlit built-in page nav container */
         [data-testid="stSidebarNav"] { display: none !important; }
         [data-testid="stSidebarNavItems"] { display: none !important; }
         [data-testid="stSidebarNavSeparator"] { display: none !important; }
-
-        /* Some versions render a navigation region in the sidebar */
         section[data-testid="stSidebar"] nav { display: none !important; }
         </style>
         """,
@@ -103,55 +107,63 @@ def render_top_bar(title: str):
 
     st.divider()
 
-# ===== AUTO-DETECT PAGES + LABELS =====
+# ===== PAGE DISCOVERY / LABELS =====
 def _label_from_filename(filename: str) -> str:
-    # e.g., "01_Module_1.py" -> "Module 1"
+    """
+    Examples:
+      "0_Course Overview.py" -> "Course Overview"
+      "_00_Module 1.py" -> "Module 1"
+    """
     base = filename.replace(".py", "")
     base = base.replace("_", " ").strip()
-    base = re.sub(r"^\d+\s*", "", base)  # remove leading numeric prefix
+    base = re.sub(r"^\d+\s*", "", base).strip()   # remove leading numeric prefix (after underscores become spaces)
     return base
 
 def _sort_key(path: Path):
-    m = re.match(r"^(\d+)_", path.name)
-    return (int(m.group(1)) if m else 10_000, path.name.lower())
+    """
+    Sort by leading number even if filename begins with underscores.
+    Examples:
+      "0_Course Overview.py" -> 0
+      "_00_Module 1.py" -> 0
+      "12_Module 12.py" -> 12
+    """
+    m = re.match(r"^_*(\d+)_", path.name)
+    n = int(m.group(1)) if m else 10_000
+    return (n, path.name.lower())
 
 @st.cache_data
 def build_pages_index():
     """
-    Returns an ORDERED dict-like mapping:
-    Home, Course Overview, Module 1..13, then any other pages.
+    Returns an ordered mapping:
+    Home, Course Overview, Module 1..13 (if present), then any remaining pages.
     """
     detected = {}
 
     # Always include Home
     detected["Home"] = "app.py"
 
-    # Detect pages from /pages
+    # Detect all .py files in /pages (INCLUDING those starting with "_")
     if PAGES_DIR.exists():
         for p in sorted(PAGES_DIR.glob("*.py"), key=_sort_key):
-            if p.name.startswith("_"):
+            # Skip only double-underscore utilities (optional rule)
+            if p.name.startswith("__"):
                 continue
             label = _label_from_filename(p.name)
             detected[label] = str(p).replace("\\", "/")
 
-    # Re-order to match your intended structure
+    # Reorder into your intended structure
     ordered = {}
-
-    # 1) Home
     if "Home" in detected:
         ordered["Home"] = detected["Home"]
 
-    # 2) Course Overview (if present)
     if "Course Overview" in detected:
         ordered["Course Overview"] = detected["Course Overview"]
 
-    # 3) Modules 1..13 (if present)
     for i in range(1, 14):
-        key = f"Module {i}"
-        if key in detected:
-            ordered[key] = detected[key]
+        k = f"Module {i}"
+        if k in detected:
+            ordered[k] = detected[k]
 
-    # 4) Any remaining pages (keep stable order)
     for k, v in detected.items():
         if k in ordered:
             continue
@@ -159,21 +171,59 @@ def build_pages_index():
 
     return ordered
 
+# ===== PATH RESOLUTION (prevents "click -> back to Home") =====
+def _canonicalize_filename(path: str) -> str:
+    # compare by filename ignoring spaces/underscores and case
+    name = Path(path).name.lower()
+    name = re.sub(r"[\s_]+", "", name)
+    return name
+
+def resolve_current_path(page_path: str) -> str:
+    """
+    Convert a page_path passed by a page into the exact path that
+    build_pages_index() knows about. Prevents default-to-Home loop.
+    """
+    pages = build_pages_index()
+    vals = list(pages.values())
+
+    # Exact match
+    if page_path in vals:
+        return page_path
+
+    # Match by filename (case-insensitive)
+    want = Path(page_path).name.lower()
+    for v in vals:
+        if Path(v).name.lower() == want:
+            return v
+
+    # Match by canonical filename (ignore spaces/underscores)
+    want2 = _canonicalize_filename(page_path)
+    for v in vals:
+        if _canonicalize_filename(v) == want2:
+            return v
+
+    return page_path
+
+def set_current_page(page_path: str):
+    st.session_state["current_page_path"] = resolve_current_path(page_path)
+
 # ===== SIDEBAR (Course Contents + Course Overview sub-navigation) =====
 def render_course_sidebar():
     st.sidebar.markdown("## 📚 Course Contents")
 
     pages = build_pages_index()
     labels = list(pages.keys())
-    current = st.session_state.get("current_page_path", "app.py")
 
-    # default selection = current page
+    current = st.session_state.get("current_page_path", "app.py")
+    current = resolve_current_path(current)
+
+    # Default selection = current page if found
+    vals = list(pages.values())
     try:
-        default_index = list(pages.values()).index(current)
+        default_index = vals.index(current)
     except ValueError:
         default_index = 0
 
-    # Main navigation (this is the "click sidebar button" behavior)
     choice = st.sidebar.radio(
         label="",
         options=labels,
@@ -182,22 +232,24 @@ def render_course_sidebar():
         label_visibility="collapsed",
     )
 
-    # If user selects something else, navigate immediately
     target = pages[choice]
-    if target != current:
+
+    # Only navigate if the target is different (prevents loops)
+    if resolve_current_path(target) != resolve_current_path(current):
         st.switch_page(target)
 
-    # ---- Course Overview sub-navigation: show ONLY when Course Overview is selected AND current page is Course Overview
-    # This ensures it appears right under the Course Overview selection, and not on other pages.
+    # ---- Course Overview sub-navigation (only on the real Course Overview page)
+    course_overview_path = pages.get("Course Overview", "")
+
     overview_section = st.session_state.get("course_overview_section", "✅ Start Here (Checklist)")
     student_full_name = st.session_state.get("student_full_name", "")
 
-    if choice == "Course Overview" and ("Course Overview" in current):
+    if choice == "Course Overview" and resolve_current_path(current) == resolve_current_path(course_overview_path):
         st.sidebar.markdown("---")
         st.sidebar.markdown("### Course Overview Navigation")
 
         st.sidebar.markdown("**Student Info**")
-        student_full_name = st.sidebar.text_input(
+        st.sidebar.text_input(
             "Your full name (used for downloads):",
             key="student_full_name",
             placeholder="Type your name here..."
@@ -219,20 +271,15 @@ def render_course_sidebar():
 
     return choice, overview_section, student_full_name
 
-# ===== ONE CALL TO SET CURRENT PAGE (for highlighting) =====
-def set_current_page(page_path: str):
-    st.session_state["current_page_path"] = page_path
-
-# ===== OPTIONAL: ONE-LINER INIT FOR EVERY PAGE =====
+# ===== ONE-LINER INIT FOR EVERY PAGE =====
 def init_course_page(title: str, page_path: str):
     """
-    Call this at the TOP of every page.
-    On Course Overview page, capture the return values to decide what content to show.
+    Call at the TOP of every page.
+    Returns the Course Overview selected section (only meaningful on Course Overview page).
     """
     apply_global_styles()
     require_access()
     set_current_page(page_path)
     render_top_bar(title)
-
-    choice, overview_section, student_full_name = render_course_sidebar()
+    _, overview_section, _ = render_course_sidebar()
     return overview_section
