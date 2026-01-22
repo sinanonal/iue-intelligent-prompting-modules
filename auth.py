@@ -1,22 +1,3 @@
-def render_top_bar(title: str):
-    col_left, col_right = st.columns([6, 2])
-
-    with col_left:
-        st.markdown(f"### {title}")
-
-    with col_right:
-        st.markdown(
-            f"<div style='text-align:right; font-size:0.85em;'>"
-            f"Signed in as <b>{st.session_state['user_email']}</b>"
-            f"</div>",
-            unsafe_allow_html=True
-        )
-        if st.button("Log out", use_container_width=True):
-            logout()
-
-    st.divider()
-
-
 import streamlit as st
 import pandas as pd
 from datetime import date
@@ -37,6 +18,7 @@ def _load_roster(path: str) -> set[str]:
         raise ValueError("Roster CSV must include a column named 'email'.")
     return {_norm_email(e) for e in df["email"].dropna()}
 
+# ===== AUTH ACTIONS =====
 def logout():
     for k in ["authorized", "user_email"]:
         if k in st.session_state:
@@ -87,3 +69,52 @@ def require_access():
 
     # IMPORTANT: stop page execution until logged in
     st.stop()
+
+# ===== UI COMPONENTS =====
+def render_top_bar(title: str):
+    col_left, col_right = st.columns([6, 2])
+
+    with col_left:
+        st.markdown(f"### {title}")
+
+    with col_right:
+        st.markdown(
+            f"<div style='text-align:right; font-size:0.85em;'>"
+            f"Signed in as <b>{st.session_state['user_email']}</b>"
+            f"</div>",
+            unsafe_allow_html=True
+        )
+        if st.button("Log out", use_container_width=True):
+            logout()
+
+    st.divider()
+
+def render_course_sidebar():
+    st.sidebar.markdown("## 📚 Course Contents")
+
+    pages = {
+        "Home": "app.py",
+        "Course Overview": "pages/00_Course Overview.py",
+        "Module 1 — Foundations": "pages/01_Module_1.py",
+        "Module 2 — Prompt Structure": "pages/02_Module_2.py",
+        "Module 3 — Core Patterns": "pages/03_Module_3.py",
+        "Module 4 — Refinement": "pages/04_Module_4.py",
+        "Module 5 — Verification": "pages/05_Module_5.py",
+        "Module 6 — Creativity": "pages/06_Module_6.py",
+        "Module 7 — Complex Inputs": "pages/07_Module_7.py",
+        "Module 8": "pages/08_Module_8.py",
+        "Module 9": "pages/09_Module_9.py",
+        "Module 10": "pages/10_Module_10.py",
+        "Module 11": "pages/11_Module_11.py",
+        "Module 12": "pages/12_Module_12.py",
+        "Module 13": "pages/13_Module_13.py",
+    }
+
+    choice = st.sidebar.radio(
+        "Navigate to:",
+        list(pages.keys()),
+        label_visibility="collapsed"
+    )
+
+    if st.sidebar.button("Open", use_container_width=True):
+        st.switch_page(pages[choice])
