@@ -158,7 +158,7 @@ elif page == "📌 Course Subjects (At a Glance)":
         st.success("Marked complete. You can revisit this section anytime.")
 
     st.markdown("---")
-    st.page_link("pages/01_Module_1.py", label="➡️ Go to Module 1")
+    st.page_link("pages/01_Module 1.py", label="➡️ Go to Module 1")
 
 # =======================================================
 # 3) SYLLABUS DOWNLOAD (requires explicit acknowledgement)
