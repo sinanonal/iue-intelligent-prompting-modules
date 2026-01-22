@@ -54,10 +54,9 @@ To begin, review the **Course Overview and Introduction** to understand how the 
 When you are ready, continue to **Module 1** to start learning about generative AI and prompting.
 """)
 
-st.markdown("---")
     col1, col2 = st.columns(2)
     with col1:
-        st.page_link("pages/01_Module 1.py", label="➡️ Go to Module 1")
+        st.page_link("pages/01_Course Overviewpy", label="➡️ Go to Course Overview")
 
 
     
