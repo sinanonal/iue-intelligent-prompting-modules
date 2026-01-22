@@ -633,7 +633,7 @@ if page == "✅ Start Here (Checklist)":
     st.subheader("✅ Module 1 Checklist")
 
     st.markdown("""
-Use this checklist to complete Module 1 in order.  
+Use this checklist to complete Module 1 in order. After completing the Module assignments, download your answer and submit the file on Blackboard.  
 You can return here anytime to see what is still missing.
 """)
 
@@ -657,7 +657,7 @@ You can return here anytime to see what is still missing.
     status_line(150 <= refl_wc <= 250, "Write the 150–250 word Module Reflection")
 
     st.markdown("---")
-    st.markdown("### ⬇️ Download Your Responses (Quizzes+Prompt Lab+Reflection)")
+    st.markdown("### ⬇️ Download Your Responses (Video Questions+Prompt Lab+Reflection)")
     section_download_block()
     goto_module_2_button()
 
@@ -688,7 +688,7 @@ elif page == "🎧 Lecture Video / Voice Recording":
         st.markdown("*Replace this placeholder with your real transcript after recording the lecture.*")
 
     st.markdown("---")
-    st.markdown("## 🧠 Interactive Video Questions")
+    st.markdown("## 🧠 Video Questions")
 
     with st.form("video_questions_form"):
         st.markdown("### **1) Please briefly introduce yourself — your major, hometown, interests, etc.**")
@@ -868,7 +868,7 @@ Submit a **150–250 word** reflection:
             st.warning("Write a reflection to preview.")
 
     st.markdown("---")
-    st.markdown("### ⬇️ Download Your Responses (Quizzes+Prompt Lab+Reflection)")
+    st.markdown("### ⬇️ Download Your Responses (Video Questions+Prompt Lab+Reflection)")
     section_download_block()
 
     goto_module_2_button()
