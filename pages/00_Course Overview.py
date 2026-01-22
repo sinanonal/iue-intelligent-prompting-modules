@@ -1,31 +1,13 @@
 import streamlit as st
-from auth import require_access, logout
+from auth import require_access, render_top_bar
 
+# 🔐 MUST BE FIRST
 require_access()
+render_top_bar("Course Overview")
 
-# ===== TOP BAR =====
-bar_left, bar_right = st.columns([6, 2])
-with bar_left:
-    st.markdown("**Intelligent Prompting Course App**")
-with bar_right:
-    st.caption(f"Signed in as {st.session_state['user_email']}")
-    if st.button("Log out"):
-        logout()
+# ---- page content ----
+st.write("Course overview content here.")
 
-st.divider()
-
-# ===== PAGE CONTENT =====
-st.title("Home")
-st.write("Main content starts here.")
-
-
-import streamlit as st
-from auth import require_access
-
-require_access()
-
-st.title("Home")
-st.write("Now the full app is visible.")
 
 
 
