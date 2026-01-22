@@ -1,2 +1,4 @@
 [server]
 fileWatcherType = "none"
+folderWatchBlacklist = [".git", ".devcontainer", "notes", "__pycache__", ".pytest_cache"]
+
