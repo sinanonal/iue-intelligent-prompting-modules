@@ -633,7 +633,7 @@ if page == "✅ Start Here (Checklist)":
     st.subheader("✅ Module 1 Checklist")
 
     st.markdown("""
-Use this checklist to complete Module 1 in order. After completing the Module assignments, download your answer and submit the file on Blackboard.  
+Use this checklist to complete Module 1 in order. After completing the Module assignments, download your responses and submit the file on Blackboard.  
 You can return here anytime to see what is still missing.
 """)
 
