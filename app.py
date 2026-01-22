@@ -1,28 +1,15 @@
-import streamlit as st
-from auth import (
-    require_access,
-    render_top_bar,
-    render_course_sidebar,
-)
 
-# 1️⃣ MUST be the first Streamlit command
+import streamlit as st
+from auth import init_course_page
+
 st.set_page_config(
     page_title="Home — Intelligent Prompting",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# 2️⃣ Hide Streamlit's default multipage navigation
-st.markdown("""
-<style>
-[data-testid="stSidebarNav"] { display: none; }
-</style>
-""", unsafe_allow_html=True)
+init_course_page("Home Page", "app.py")
 
-# 3️⃣ Auth + UI chrome
-require_access()
-render_top_bar("Home Page")
-render_course_sidebar()
 
 
 # ===== PAGE CONTENT =====
