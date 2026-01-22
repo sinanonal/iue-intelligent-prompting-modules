@@ -1,17 +1,10 @@
 import streamlit as st
-from auth import require_access, render_top_bar, render_course_sidebar
+from auth import init_course_page
 
 st.set_page_config(page_title="Module 1", layout="wide")
 
-st.markdown("""
-<style>
-[data-testid="stSidebarNav"] { display: none; }
-</style>
-""", unsafe_allow_html=True)
+init_course_page("Module 1 — Foundations", "pages/01_Module_1.py")
 
-require_access()
-render_top_bar("Module 1 — Foundations")
-render_course_sidebar()
 
 
 # -----------------------------------------
