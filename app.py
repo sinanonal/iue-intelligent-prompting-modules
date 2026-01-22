@@ -6,7 +6,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-st.title("📘 Intelligent Prompting")
+st.title("📘 IIntelligent Prompting: Using AI for Creative and Analytical Thinking")
 st.header("Welcome")
 
 st.markdown("""
@@ -19,51 +19,39 @@ This is an **interdisciplinary course**, which means students from **all majors*
 Throughout the course, we emphasize **critical thinking and responsible AI use**. AI can be a powerful assistant, but it also has limitations. You will learn how to evaluate AI responses, recognize potential errors or bias, and use these tools ethically and transparently.
 
 By the end of the course, you will develop your own **personal prompting practice**—one that helps you think more clearly, communicate more effectively, and collaborate responsibly with AI systems.
+
 """)
 
 st.markdown("---")
 
-st.subheader("Course Description")
+st.subheader("📬 Questions, Feedback, and Communication")
+
 st.markdown("""
-This interdisciplinary course introduces students to the art and science of intelligent prompting—the skill of communicating effectively with large language models (LLMs) such as ChatGPT, Claude, Gemini, and Copilot.
+If you have **any questions**, need clarification at any point, or would like to share **feedback on how to make this course better**, please do not hesitate to reach out.
 
-Through hands-on practice, interactive modules, and real-world scenarios, students from all majors and experience levels learn how to design clear, effective prompts for creative tasks, analytical reasoning, multimodal inputs, data interpretation, and discipline-specific applications.
-
-The course emphasizes critical thinking, ethical awareness, and responsible human-AI collaboration. Students explore how generative AI can support education, research, healthcare communication, engineering reasoning, design workflows, business decisions, social science inquiry, media production, and more. By the end of the course, students develop a personal prompting practice grounded in clarity, reliability, and interdisciplinary relevance.
+Your questions and suggestions are always welcome, and they help improve the course for everyone.
 """)
 
-st.subheader("Course Prerequisites")
+st.markdown(
+    "📧 **Email:** "
+    "[sonal@siue.edu](mailto:sonal@siue.edu)"
+)
+
+st.markdown("---")
+
+st.subheader("🚀 Getting Started")
+
 st.markdown("""
-- **None**
-- Open to students from **all majors** and **all academic levels**
-- **No programming** or prior AI knowledge is required
+To begin, review the **Course Overview and Introduction** to understand how the course is organized.  
+When you are ready, continue to **Module 1** to start learning about generative AI and prompting.
 """)
 
-st.subheader("Required Textbook")
-st.markdown("""
-- **None**
-- All readings, handouts, prompts, and resources will be provided
-""")
+col1, col2 = st.columns(2)
 
-st.subheader("Course Outcomes")
-st.markdown("""
-Students who successfully complete this course will be able to:
+with col1:
+    if st.button("📘 Go to Course Overview"):
+        st.switch_page("pages/00_Course_Overview.py")
 
-1. Explain how generative AI and large language models interpret instructions and produce responses in ways that support learning, creativity, and problem-solving across disciplines.  
-2. Design structured prompts and multi-step prompting workflows for creative, analytical, multimodal, and data-rich tasks relevant to academic and professional settings.  
-3. Apply prompting techniques within their own major or field of interest, using discipline-specific reasoning, terminology, and authentic scenarios.  
-4. Evaluate AI-generated content for accuracy, bias, ethical concerns, hallucinations, usefulness, reliability, and disciplinary appropriateness.  
-5. Use AI to improve communication, including writing, explanation, reasoning, brainstorming, and organizing information for different audiences and purposes.  
-6. Develop a responsible, transparent, and ethical prompting practice that incorporates verification, critical thinking, and awareness of social and professional implications.  
-""")
-
-st.subheader("Technology Requirements")
-st.markdown("""
-To participate in this fully online course, students need:
-
-- Access to an LLM platform such as **ChatGPT, Claude, Gemini, or Bing/Copilot**  
-  *(Free versions are acceptable unless otherwise noted.)*
-- Reliable internet access for video lectures, online discussion, and AI tools
-- Basic writing tools (word processors, note-taking apps, note-taking apps, or LMS tools)
-- A device capable of viewing course videos and running web-based AI platforms
-""")
+with col2:
+    if st.button("➡️ Go to Module 1"):
+        st.switch_page("pages/01_Module_1.py")
