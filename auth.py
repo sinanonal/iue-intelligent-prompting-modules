@@ -8,7 +8,6 @@ import re
 SEMESTER_END = date(2026, 5, 15)
 ROSTER_PATH = "roster.csv"
 ALLOWED_DOMAIN = "@siue.edu"
-
 PAGES_DIR = Path("pages")
 
 # ===== HELPERS =====
@@ -107,55 +106,33 @@ def render_top_bar(title: str):
 
     st.divider()
 
-# ===== PAGE DISCOVERY / LABELS =====
+# ===== PAGE DISCOVERY =====
 def _label_from_filename(filename: str) -> str:
-    """
-    Examples:
-      "0_Course Overview.py" -> "Course Overview"
-      "_00_Module 1.py" -> "Module 1"
-    """
+    # "00_Course Overview.py" -> "Course Overview"
+    # "01_Module 1.py" -> "Module 1"
     base = filename.replace(".py", "")
     base = base.replace("_", " ").strip()
-    base = re.sub(r"^\d+\s*", "", base).strip()   # remove leading numeric prefix (after underscores become spaces)
+    base = re.sub(r"^\d+\s*", "", base).strip()  # remove leading number
     return base
 
 def _sort_key(path: Path):
-    """
-    Sort by leading number even if filename begins with underscores.
-    Examples:
-      "0_Course Overview.py" -> 0
-      "_00_Module 1.py" -> 0
-      "12_Module 12.py" -> 12
-    """
-    m = re.match(r"^_*(\d+)_", path.name)
-    n = int(m.group(1)) if m else 10_000
-    return (n, path.name.lower())
+    m = re.match(r"^(\d+)_", path.name)
+    return (int(m.group(1)) if m else 10_000, path.name.lower())
 
 @st.cache_data
 def build_pages_index():
-    """
-    Returns an ordered mapping:
-    Home, Course Overview, Module 1..13 (if present), then any remaining pages.
-    """
-    detected = {}
+    detected = {"Home": "app.py"}
 
-    # Always include Home
-    detected["Home"] = "app.py"
-
-    # Detect all .py files in /pages (INCLUDING those starting with "_")
     if PAGES_DIR.exists():
         for p in sorted(PAGES_DIR.glob("*.py"), key=_sort_key):
-            # Skip only double-underscore utilities (optional rule)
             if p.name.startswith("__"):
                 continue
             label = _label_from_filename(p.name)
             detected[label] = str(p).replace("\\", "/")
 
-    # Reorder into your intended structure
+    # Force intended order:
     ordered = {}
-    if "Home" in detected:
-        ordered["Home"] = detected["Home"]
-
+    ordered["Home"] = detected["Home"]
     if "Course Overview" in detected:
         ordered["Course Overview"] = detected["Course Overview"]
 
@@ -171,32 +148,28 @@ def build_pages_index():
 
     return ordered
 
-# ===== PATH RESOLUTION (prevents "click -> back to Home") =====
+# ===== PATH RESOLUTION (prevents "click -> Home" loop) =====
 def _canonicalize_filename(path: str) -> str:
-    # compare by filename ignoring spaces/underscores and case
+    # compare by filename ignoring spaces/underscores/case
     name = Path(path).name.lower()
     name = re.sub(r"[\s_]+", "", name)
     return name
 
 def resolve_current_path(page_path: str) -> str:
-    """
-    Convert a page_path passed by a page into the exact path that
-    build_pages_index() knows about. Prevents default-to-Home loop.
-    """
     pages = build_pages_index()
     vals = list(pages.values())
 
-    # Exact match
+    # exact
     if page_path in vals:
         return page_path
 
-    # Match by filename (case-insensitive)
+    # filename match (case-insensitive)
     want = Path(page_path).name.lower()
     for v in vals:
         if Path(v).name.lower() == want:
             return v
 
-    # Match by canonical filename (ignore spaces/underscores)
+    # canonical match (spaces/underscores ignored)
     want2 = _canonicalize_filename(page_path)
     for v in vals:
         if _canonicalize_filename(v) == want2:
@@ -207,17 +180,15 @@ def resolve_current_path(page_path: str) -> str:
 def set_current_page(page_path: str):
     st.session_state["current_page_path"] = resolve_current_path(page_path)
 
-# ===== SIDEBAR (Course Contents + Course Overview sub-navigation) =====
+# ===== SIDEBAR =====
 def render_course_sidebar():
     st.sidebar.markdown("## 📚 Course Contents")
 
     pages = build_pages_index()
     labels = list(pages.keys())
 
-    current = st.session_state.get("current_page_path", "app.py")
-    current = resolve_current_path(current)
+    current = resolve_current_path(st.session_state.get("current_page_path", "app.py"))
 
-    # Default selection = current page if found
     vals = list(pages.values())
     try:
         default_index = vals.index(current)
@@ -234,17 +205,18 @@ def render_course_sidebar():
 
     target = pages[choice]
 
-    # Only navigate if the target is different (prevents loops)
+    # Important: only switch if the target is different (prevents loops)
     if resolve_current_path(target) != resolve_current_path(current):
         st.switch_page(target)
 
-    # ---- Course Overview sub-navigation (only on the real Course Overview page)
+    # Course Overview sub-navigation only when you are actually on that page
     course_overview_path = pages.get("Course Overview", "")
-
     overview_section = st.session_state.get("course_overview_section", "✅ Start Here (Checklist)")
-    student_full_name = st.session_state.get("student_full_name", "")
 
-    if choice == "Course Overview" and resolve_current_path(current) == resolve_current_path(course_overview_path):
+    if (
+        choice == "Course Overview"
+        and resolve_current_path(current) == resolve_current_path(course_overview_path)
+    ):
         st.sidebar.markdown("---")
         st.sidebar.markdown("### Course Overview Navigation")
 
@@ -269,17 +241,17 @@ def render_course_sidebar():
             label_visibility="collapsed",
         )
 
-    return choice, overview_section, student_full_name
+    return choice, overview_section
 
-# ===== ONE-LINER INIT FOR EVERY PAGE =====
+# ===== INIT =====
 def init_course_page(title: str, page_path: str):
     """
-    Call at the TOP of every page.
-    Returns the Course Overview selected section (only meaningful on Course Overview page).
+    Call this at the top of every page.
+    Returns selected Course Overview section (only meaningful on Course Overview page).
     """
     apply_global_styles()
     require_access()
     set_current_page(page_path)
     render_top_bar(title)
-    _, overview_section, _ = render_course_sidebar()
+    _, overview_section = render_course_sidebar()
     return overview_section
