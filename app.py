@@ -111,8 +111,8 @@ if page == "🎧 Lecture Video / Voice Recording":
     # -------- Video (YouTube or YuJa via iframe) --------
     st.markdown("### 📺 Video Lecture")
     # For YuJa, replace with your iframe embed URL:
-    # st.components.v1.iframe("Yhttps://siue.yuja.com/Dashboard/Permalink?authCode=167158588&b=14078175&linkType=video", width=800, height=450)
-    st.video("hhttps://siue.yuja.com/Dashboard/Permalink?authCode=167158588&b=14078175&linkType=video")  # Replace with your URL, or switch to iframe above
+    # st.components.v1.iframe("https://siue.yuja.com/Dashboard/Permalink?authCode=167158588&b=14078175&linkType=video", width=800, height=450)
+    st.video("https://siue.yuja.com/Dashboard/Permalink?authCode=167158588&b=14078175&linkType=video")  # Replace with your URL, or switch to iframe above
 
 
     # -------- Transcript --------
