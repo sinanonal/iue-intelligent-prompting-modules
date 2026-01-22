@@ -14,21 +14,6 @@ with bar_right:
 
 st.divider()
 
-# ===== PAGE CONTENT =====
-st.title("Home")
-st.write("Main content starts here.")
-
-
-import streamlit as st
-from auth import require_access
-
-require_access()
-
-st.title("Home")
-st.write("Now the full app is visible.")
-
-
-
 # -----------------------------------------
 #   TIER 1 — Foundations of Generative AI
 #   MODULE 1 — Foundations of Generative AI
