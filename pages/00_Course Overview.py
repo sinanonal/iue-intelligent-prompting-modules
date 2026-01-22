@@ -185,7 +185,7 @@ elif page == "📄 Download Course Syllabus":
         st.success("Syllabus step marked complete.")
 
     st.markdown("---")
-    st.page_link("pages/01_Module_1.py", label="➡️ Go to Module 1")
+    st.page_link("pages/01_Module 1.py", label="➡️ Go to Module 1")
 
 # =======================================================
 # 4) OVERVIEW VIDEO + QUESTIONS (flag set only on successful submit)
