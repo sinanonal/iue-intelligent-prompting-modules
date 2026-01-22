@@ -7,10 +7,8 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# This draws: top bar + sidebar nav + auth gate
 init_course_page("Home Page", "app.py")
 
-# ===== PAGE CONTENT =====
 st.title("📘 Intelligent Prompting: Using AI for Creative and Analytical Thinking")
 st.header("Welcome")
 
@@ -29,30 +27,20 @@ By the end of the course, you will develop your own **personal prompting practic
 st.markdown("---")
 
 st.subheader("📬 Questions, Feedback, and Communication")
-
 st.markdown("""
 If you have **any questions**, need clarification at any point, or would like to share **feedback on how to make this course better**, please do not hesitate to reach out.
-
-Your questions and suggestions are always welcome, and they help improve the course for everyone.
 """)
-
-st.markdown(
-    "📧 **Email:** "
-    "[sonal@siue.edu](mailto:sonal@siue.edu)"
-)
+st.markdown("📧 **Email:** [sonal@siue.edu](mailto:sonal@siue.edu)")
 
 st.markdown("---")
 
 st.subheader("🚀 Getting Started")
-
 st.markdown("""
-To begin, use the **sidebar** to open **Course Overview** and review the introduction.  
-When you are ready, continue to **Module 1** from the sidebar.
+Use the **sidebar** to open **Course Overview** first.  
+Then continue to **Module 1** from the same sidebar.
 """)
 
-# Optional: keep a button, but route using st.switch_page safely
 col1, col2, col3 = st.columns(3)
-
 with col1:
     if st.button("➡️ Course Overview", use_container_width=True):
-        st.switch_page("pages/00_Course Overview.py")  # MUST match your real filename exactly
+        st.switch_page("pages/0_Course Overview.py")
