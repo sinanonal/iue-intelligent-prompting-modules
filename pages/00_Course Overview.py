@@ -1,3 +1,11 @@
+import streamlit as st
+from auth import require_access
+
+require_access()
+
+st.write("Course overview content here")
+
+
 # ==========================================================
 # pages/00_Course_Overview.py
 # Course Overview checklist updates ONLY after explicit student actions
