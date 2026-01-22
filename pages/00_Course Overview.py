@@ -2,18 +2,10 @@ import streamlit as st
 from auth import require_access
 
 require_access()
-st.sidebar.empty()
 
+st.title("Home")
+st.write("Now the full app is visible.")
 
-st.write("Module 1 content here")
-
-
-import streamlit as st
-from auth import require_access
-
-require_access()
-
-st.write("Course overview content here")
 
 
 # ==========================================================
