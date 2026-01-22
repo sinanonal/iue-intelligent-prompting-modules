@@ -1,18 +1,18 @@
 import streamlit as st
 from auth import require_access, render_top_bar
 
-require_access()
-render_top_bar("Home Page")
-
-
-
-import streamlit as st
-
+# MUST be the first Streamlit command
 st.set_page_config(
     page_title="Home — Intelligent Prompting",
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# Auth + top bar
+require_access()
+render_top_bar("Home Page")
+
+# ===== PAGE CONTENT =====
 
 st.title("📘 Intelligent Prompting: Using AI for Creative and Analytical Thinking")
 st.header("Welcome")
@@ -27,7 +27,6 @@ This is an **interdisciplinary course**, which means students from **all majors*
 Throughout the course, we emphasize **critical thinking and responsible AI use**. AI can be a powerful assistant, but it also has limitations. You will learn how to evaluate AI responses, recognize potential errors or bias, and use these tools ethically and transparently.
 
 By the end of the course, you will develop your own **personal prompting practice**—one that helps you think more clearly, communicate more effectively, and collaborate responsibly with AI systems.
-
 """)
 
 st.markdown("---")
@@ -54,13 +53,11 @@ To begin, review the **Course Overview and Introduction** to understand how the 
 When you are ready, continue to **Module 1** to start learning about generative AI and prompting.
 """)
 
-   col1, col2 = st.columns(2)
+# Navigation button (size will match other page_link buttons)
+col1, col2, col3 = st.columns(3)
 
 with col1:
     st.page_link(
-        "pages/00_Course_Overview.py",
+        "pages/00_Course Overview.py",
         label="➡️ Course Overview"
     )
-
-
-
