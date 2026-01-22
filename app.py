@@ -1,23 +1,29 @@
-from auth import require_access, render_top_bar, render_course_sidebar
-
-require_access()
-render_top_bar("Home Page")          # change title per page
-render_course_sidebar()
-
-
 import streamlit as st
-from auth import require_access, render_top_bar
+from auth import (
+    require_access,
+    render_top_bar,
+    render_course_sidebar,
+)
 
-# MUST be the first Streamlit command
+# 1️⃣ MUST be the first Streamlit command
 st.set_page_config(
     page_title="Home — Intelligent Prompting",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Auth + top bar
+# 2️⃣ Hide Streamlit's default multipage navigation
+st.markdown("""
+<style>
+[data-testid="stSidebarNav"] { display: none; }
+</style>
+""", unsafe_allow_html=True)
+
+# 3️⃣ Auth + UI chrome
 require_access()
 render_top_bar("Home Page")
+render_course_sidebar()
+
 
 # ===== PAGE CONTENT =====
 
