@@ -56,11 +56,12 @@ When you are ready, continue to **Module 1** to start learning about generative 
 
 st.markdown("---")
 
-col1 = st.columns(1)
+col1, col2, col3 = st.columns(3)
 
 with col1:
     if st.button("➡️ Go to Course Overview", use_container_width=True):
         st.switch_page("pages/00_Course_Overview.py")
+
 
     
 
