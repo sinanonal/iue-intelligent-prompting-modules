@@ -1,35 +1,26 @@
-import streamlit as st
-from auth import require_access, render_top_bar, render_course_sidebar
-
-st.set_page_config(page_title="Course Overview", layout="wide")
-
-st.markdown("""
-<style>
-[data-testid="stSidebarNav"] { display: none; }
-</style>
-""", unsafe_allow_html=True)
-
-require_access()
-render_top_bar("Course Overview")
-render_course_sidebar()
-
-
-
-
-# ==========================================================
 # pages/00_Course_Overview.py
 # Course Overview checklist updates ONLY after explicit student actions
 # (NO Module 1 checklist shown here)
-# ==========================================================
+
 import streamlit as st
 import io
 import csv
 from datetime import datetime
 
+from auth import init_course_page
+
 st.set_page_config(
     page_title="Course Overview & Introduction",
     layout="wide",
     initial_sidebar_state="expanded"
+)
+
+# --- IMPORTANT ---
+# This draws: global styles + login gate + top bar + sidebar nav.
+# It also returns the selected "Course Overview" section from the sidebar.
+overview_section = init_course_page(
+    title="Course Overview",
+    page_path="pages/00_Course_Overview.py"
 )
 
 # ------------------ UTILITIES ------------------
@@ -42,7 +33,8 @@ def init_flag(key: str, default: bool = False):
 
 def build_overview_csv_bytes():
     """Downloadable CSV for Course Overview page (includes completion flags + answers)."""
-    name = safe_strip("student_name")
+    # NOTE: name is now stored in auth.py as "student_full_name"
+    name = safe_strip("student_full_name")
     ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     ov_q1 = safe_strip("ov_q1")
@@ -70,7 +62,7 @@ def build_overview_csv_bytes():
 
 def overview_download_block():
     """Show download if student has name and/or any content/flags."""
-    name = safe_strip("student_name")
+    name = safe_strip("student_full_name")
     has_any = any([
         name,
         safe_strip("ov_q1"),
@@ -92,7 +84,7 @@ def overview_download_block():
             help="Download your name, completion status, and responses as a CSV file."
         )
     else:
-        st.info("Enter your name and complete at least one item to enable the download button.")
+        st.info("Enter your name (in the sidebar) and complete at least one item to enable the download button.")
 
 # ------------------ FLAGS (explicit completion) ------------------
 init_flag("overview_subjects_completed", False)
@@ -107,22 +99,8 @@ Use the left sidebar to go through each section.
 Your **Start Here checklist** updates only after you complete the required action in each section.
 """)
 
-# ------------------ SIDEBAR ------------------
-st.sidebar.title("Course Overview Navigation")
-st.sidebar.markdown("**Student Info**")
-st.sidebar.text_input("Your full name (used for downloads):", key="student_name")
-st.sidebar.markdown("---")
-
-page = st.sidebar.radio(
-    "Choose a section:",
-    [
-        "✅ Start Here (Checklist)",
-        "📌 Course Subjects (At a Glance)",
-        "📄 Download Course Syllabus",
-        "🎥 Course Overview Video + Questions",
-        "📝 Introduction Reflection",
-    ]
-)
+# Use the sidebar-selected section (from auth.py)
+page = overview_section or "✅ Start Here (Checklist)"
 
 # =======================================================
 # 1) CHECKLIST (ONLY course overview items)
@@ -137,7 +115,7 @@ Complete these items in order. After finishing, download your responses if requi
     def status_line(done: bool, text: str):
         st.write(("✅ " if done else "⬜ ") + text)
 
-    status_line(bool(safe_strip("student_name")), "Enter your full name (left sidebar)")
+    status_line(bool(safe_strip("student_full_name")), "Enter your full name (sidebar)")
     status_line(st.session_state["overview_subjects_completed"], "Review course subjects and click “I reviewed”")
     status_line(st.session_state["overview_syllabus_completed"], "Open the syllabus and click “I opened”")
     status_line(st.session_state["overview_video_completed"], "Watch overview video + submit Q1 and Q2")
@@ -150,8 +128,8 @@ Complete these items in order. After finishing, download your responses if requi
     st.markdown("---")
     col1, col2 = st.columns(2)
     with col1:
-        st.page_link("pages/01_Module 1.py", label="➡️ Go to Module 1")
-    
+        if st.button("➡️ Go to Module 1", use_container_width=True):
+            st.switch_page("pages/01_Module_1.py")
 
 # =======================================================
 # 2) COURSE SUBJECTS (requires explicit acknowledgement)
@@ -169,12 +147,13 @@ elif page == "📌 Course Subjects (At a Glance)":
 """)
 
     st.markdown("---")
-    if st.button("✅ I reviewed the course subjects"):
+    if st.button("✅ I reviewed the course subjects", use_container_width=True):
         st.session_state["overview_subjects_completed"] = True
         st.success("Marked complete. You can revisit this section anytime.")
 
     st.markdown("---")
-    st.page_link("pages/01_Module 1.py", label="➡️ Go to Module 1")
+    if st.button("➡️ Go to Module 1", use_container_width=True):
+        st.switch_page("pages/01_Module_1.py")
 
 # =======================================================
 # 3) SYLLABUS DOWNLOAD (requires explicit acknowledgement)
@@ -189,19 +168,21 @@ elif page == "📄 Download Course Syllabus":
                 label="Download Syllabus (DOCX)",
                 data=f,
                 file_name="Syllabus.docx",
-                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                use_container_width=True
             )
     except Exception:
         st.warning(f"Could not find `{syllabus_path}`. Make sure it exists in the `notes/` folder.")
 
     st.markdown("---")
     st.caption("After opening the file, click below to mark this step complete.")
-    if st.button("✅ I opened and reviewed the syllabus"):
+    if st.button("✅ I opened and reviewed the syllabus", use_container_width=True):
         st.session_state["overview_syllabus_completed"] = True
         st.success("Syllabus step marked complete.")
 
     st.markdown("---")
-    st.page_link("pages/01_Module 1.py", label="➡️ Go to Module 1")
+    if st.button("➡️ Go to Module 1", use_container_width=True):
+        st.switch_page("pages/01_Module_1.py")
 
 # =======================================================
 # 4) OVERVIEW VIDEO + QUESTIONS (flag set only on successful submit)
@@ -236,7 +217,8 @@ elif page == "🎥 Course Overview Video + Questions":
     overview_download_block()
 
     st.markdown("---")
-    st.page_link("pages/01_Module 1.py", label="➡️ Go to Module 1")
+    if st.button("➡️ Go to Module 1", use_container_width=True):
+        st.switch_page("pages/01_Module_1.py")
 
 # =======================================================
 # 5) INTRO REFLECTION (requires explicit mark complete)
@@ -256,7 +238,7 @@ Write a short reflection (about **100–150 words**):
     col1, col2 = st.columns([1, 1])
 
     with col1:
-        if st.button("✅ Mark Reflection Complete"):
+        if st.button("✅ Mark Reflection Complete", use_container_width=True):
             if safe_strip("ov_reflection"):
                 st.session_state["overview_reflection_completed"] = True
                 st.success("Reflection marked complete. You can revise anytime if needed.")
@@ -268,4 +250,5 @@ Write a short reflection (about **100–150 words**):
         overview_download_block()
 
     st.markdown("---")
-    st.page_link("pages/01_Module 1.py", label="➡️ Go to Module 1")
+    if st.button("➡️ Go to Module 1", use_container_width=True):
+        st.switch_page("pages/01_Module_1.py")
