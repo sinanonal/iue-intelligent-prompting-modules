@@ -239,6 +239,7 @@ this distinction is critical for interpreting their output accurately and using
 them appropriately in academic work..
 """)
 
+    elif page == "What generative AI is and how it works":
     st.markdown("### 🧪 Quick Activity: Check Your Understanding")
 
 # Question 1
