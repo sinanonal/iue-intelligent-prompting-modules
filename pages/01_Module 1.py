@@ -1,18 +1,11 @@
 import streamlit as st
-from auth import require_access, logout
+from auth import require_access, render_top_bar
 
 require_access()
+render_top_bar("Module 1 – Foundations")
 
-# ===== TOP BAR =====
-bar_left, bar_right = st.columns([6, 2])
-with bar_left:
-    st.markdown("**Intelligent Prompting Course App**")
-with bar_right:
-    st.caption(f"Signed in as {st.session_state['user_email']}")
-    if st.button("Log out"):
-        logout()
+st.write("Module 1 content here.")
 
-st.divider()
 
 # -----------------------------------------
 #   TIER 1 — Foundations of Generative AI
