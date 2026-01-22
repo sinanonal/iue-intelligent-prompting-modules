@@ -1,5 +1,4 @@
 import streamlit as st
-st.title("🏠 Home")
 st.set_page_config(
     page_title="Intelligent Prompting",
     layout="wide",
