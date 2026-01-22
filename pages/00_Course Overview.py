@@ -63,7 +63,7 @@ def goto_module_1_button():
             # Examples:
             # st.switch_page("pages/01_Module_1.py")
             # st.switch_page("pages/Module 1.py")
-            st.switch_page("pages/01_Module_1.py")
+            st.switch_page("pages/01_Module 1.py")
         except Exception:
             st.info("Module 1 page was not found. Make sure your Module 1 file exists in `/pages` and update the path here.")
 
