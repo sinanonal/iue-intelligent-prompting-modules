@@ -69,8 +69,6 @@ def require_access():
 
 # ===== GLOBAL UI FIX: HIDE STREAMLIT DEFAULT NAV =====
 def apply_global_styles():
-    # This hides Streamlit's built-in multipage nav (the "app / Module 1 / View more" list)
-    # We use multiple selectors to handle different Streamlit versions.
     st.markdown(
         """
         <style>
@@ -105,44 +103,68 @@ def render_top_bar(title: str):
 
     st.divider()
 
-# ===== AUTO-DETECT PAGES + HIGHLIGHT CURRENT =====
+# ===== AUTO-DETECT PAGES + LABELS =====
 def _label_from_filename(filename: str) -> str:
     # e.g., "01_Module_1.py" -> "Module 1"
     base = filename.replace(".py", "")
     base = base.replace("_", " ").strip()
-
-    # remove leading numeric prefix like "01 " or "00 "
-    base = re.sub(r"^\d+\s*", "", base)
-
-    # normalize common labels
-    base = base.replace("Course Overview", "Course Overview")
-
+    base = re.sub(r"^\d+\s*", "", base)  # remove leading numeric prefix
     return base
 
 def _sort_key(path: Path):
-    # Sort by leading number if present, else push to bottom
     m = re.match(r"^(\d+)_", path.name)
     return (int(m.group(1)) if m else 10_000, path.name.lower())
 
 @st.cache_data
 def build_pages_index():
-    pages = {"Home": "app.py"}
+    """
+    Returns an ORDERED dict-like mapping:
+    Home, Course Overview, Module 1..13, then any other pages.
+    """
+    detected = {}
 
+    # Always include Home
+    detected["Home"] = "app.py"
+
+    # Detect pages from /pages
     if PAGES_DIR.exists():
         for p in sorted(PAGES_DIR.glob("*.py"), key=_sort_key):
             if p.name.startswith("_"):
                 continue
             label = _label_from_filename(p.name)
-            pages[label] = str(p).replace("\\", "/")  # safe on Windows too
+            detected[label] = str(p).replace("\\", "/")
 
-    return pages
+    # Re-order to match your intended structure
+    ordered = {}
 
+    # 1) Home
+    if "Home" in detected:
+        ordered["Home"] = detected["Home"]
+
+    # 2) Course Overview (if present)
+    if "Course Overview" in detected:
+        ordered["Course Overview"] = detected["Course Overview"]
+
+    # 3) Modules 1..13 (if present)
+    for i in range(1, 14):
+        key = f"Module {i}"
+        if key in detected:
+            ordered[key] = detected[key]
+
+    # 4) Any remaining pages (keep stable order)
+    for k, v in detected.items():
+        if k in ordered:
+            continue
+        ordered[k] = v
+
+    return ordered
+
+# ===== SIDEBAR (Course Contents + Course Overview sub-navigation) =====
 def render_course_sidebar():
     st.sidebar.markdown("## 📚 Course Contents")
 
     pages = build_pages_index()
     labels = list(pages.keys())
-
     current = st.session_state.get("current_page_path", "app.py")
 
     # default selection = current page
@@ -151,17 +173,51 @@ def render_course_sidebar():
     except ValueError:
         default_index = 0
 
+    # Main navigation (this is the "click sidebar button" behavior)
     choice = st.sidebar.radio(
-        "Navigate to:",
-        labels,
+        label="",
+        options=labels,
         index=default_index,
-        label_visibility="collapsed"
+        key="course_contents_choice",
+        label_visibility="collapsed",
     )
 
-    # Navigate immediately when a different choice is made
+    # If user selects something else, navigate immediately
     target = pages[choice]
     if target != current:
         st.switch_page(target)
+
+    # ---- Course Overview sub-navigation: show ONLY when Course Overview is selected AND current page is Course Overview
+    # This ensures it appears right under the Course Overview selection, and not on other pages.
+    overview_section = st.session_state.get("course_overview_section", "✅ Start Here (Checklist)")
+    student_full_name = st.session_state.get("student_full_name", "")
+
+    if choice == "Course Overview" and ("Course Overview" in current):
+        st.sidebar.markdown("---")
+        st.sidebar.markdown("### Course Overview Navigation")
+
+        st.sidebar.markdown("**Student Info**")
+        student_full_name = st.sidebar.text_input(
+            "Your full name (used for downloads):",
+            key="student_full_name",
+            placeholder="Type your name here..."
+        )
+
+        st.sidebar.markdown("**Choose a section:**")
+        overview_section = st.sidebar.radio(
+            label="",
+            options=[
+                "✅ Start Here (Checklist)",
+                "📌 Course Subjects (At a Glance)",
+                "📄 Download Course Syllabus",
+                "🎥 Course Overview Video + Questions",
+                "📝 Introduction Reflection",
+            ],
+            key="course_overview_section",
+            label_visibility="collapsed",
+        )
+
+    return choice, overview_section, student_full_name
 
 # ===== ONE CALL TO SET CURRENT PAGE (for highlighting) =====
 def set_current_page(page_path: str):
@@ -169,8 +225,14 @@ def set_current_page(page_path: str):
 
 # ===== OPTIONAL: ONE-LINER INIT FOR EVERY PAGE =====
 def init_course_page(title: str, page_path: str):
+    """
+    Call this at the TOP of every page.
+    On Course Overview page, capture the return values to decide what content to show.
+    """
     apply_global_styles()
     require_access()
     set_current_page(page_path)
     render_top_bar(title)
-    render_course_sidebar()
+
+    choice, overview_section, student_full_name = render_course_sidebar()
+    return overview_section
