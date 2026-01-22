@@ -220,7 +220,7 @@ elif page == "🎥 Course Overview Video + Questions":
     overview_download_block()
 
     st.markdown("---")
-    st.page_link("pages/01_Module_1.py", label="➡️ Go to Module 1")
+    st.page_link("pages/01_Module 1.py", label="➡️ Go to Module 1")
 
 # =======================================================
 # 5) INTRO REFLECTION (requires explicit mark complete)
